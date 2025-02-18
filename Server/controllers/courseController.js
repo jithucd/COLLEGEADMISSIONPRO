@@ -1,5 +1,6 @@
 const Course = require("../models/Course");
 const College = require("../models/College");
+const User = require("../models/User");
 
 // Add a new course (admin or college admin)
 exports.addCourse = async (req, res) => {
@@ -60,6 +61,13 @@ exports.addToFavorites = async (req, res) => {
     const { courseId } = req.body;
     const user = await User.findById(req.user.id);
 
+    // Check if course exists
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+    
+    
     if (!user.favorites.includes(courseId)) {
       user.favorites.push(courseId);
       await user.save();

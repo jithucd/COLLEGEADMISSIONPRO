@@ -42,3 +42,16 @@
 {"level":"info","message":"POST /api/colleges/67b4b14509946ebfec476527/courses"}
 {"level":"info","message":"POST /api/colleges/67b4b14509946ebfec476527/courses"}
 {"level":"info","message":"POST /api/colleges/67b4b14509946ebfec476527/courses"}
+{"level":"info","message":"GET /api/courses"}
+{"level":"info","message":"GET /api/users/profile"}
+{"level":"info","message":"GET //api/auth/login"}
+{"level":"info","message":"GET //api/auth/login"}
+{"level":"info","message":"GET /api/auth/register"}
+{"level":"info","message":"POST /api/auth/register"}
+{"level":"info","message":"POST /api/auth/signup"}
+{"level":"info","message":"POST /api/auth/login"}
+{"level":"info","message":"GET /api/users/profile"}
+{"level":"info","message":"GET /api/users/profile"}
+{"level":"info","message":"PUT /api/users/profile"}
+{"level":"info","message":"GET /api/courses"}
+{"level":"info","message":"POST /api/courses/favorites"}

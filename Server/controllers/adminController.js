@@ -27,7 +27,7 @@ exports.deleteUser = async (req, res) => {
 exports.createCollege = async (req, res) => {
   try {
     const { name, location, description } = req.body;
-    const college = await College.create({ name, location, description });
+    const college = await College.create({ name, location, description,admin: req.user.id  });
     res.status(201).json({ success: true, college });
   } catch (err) {
     res.status(500).json({ error: "Failed to create college" });
