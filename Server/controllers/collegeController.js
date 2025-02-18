@@ -22,22 +22,22 @@ exports.getCollegeById = async (req, res) => {
 };
 
 // Add a course to a college
-// exports.addCourse = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const { title, description, fees, duration } = req.body;
+exports.addCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description, fees, duration } = req.body;
 
-//     const college = await College.findById(id);
-//     if (!college) {
-//       return res.status(404).json({ error: "College not found" });
-//     }
+    const college = await College.findById(id);
+    if (!college) {
+      return res.status(404).json({ error: "College not found" });
+    }
 
-//     const course = await Course.create({ title, description, fees, duration, college: id });
-//     college.courses.push(course._id);
-//     await college.save();
+    const course = await Course.create({ title, description, fees, duration, college: id });
+    college.courses.push(course._id);
+    await college.save();
 
-//     res.status(201).json({ success: true, course });
-//   } catch (err) {
-//     res.status(500).json({ error: "Failed to add course" });
-//   }
-// };
+    res.status(201).json({ success: true, course });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to add course" });
+  }
+};

@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-
+const College = require("../models/College");
 
 exports.authenticate = async (req, res, next) => {
   try {
@@ -37,7 +37,7 @@ exports.isAdmin = (req, res, next) => {
 
 // Check if user is a college admin for a specific college
 exports.isCollegeAdmin = async (req, res, next) => {
-  const { collegeId } = req.params;
+  const { collegeId } = req.params.id;
 
   // Find the college
   const college = await College.findById(collegeId);
@@ -51,4 +51,10 @@ exports.isCollegeAdmin = async (req, res, next) => {
   }
 
   next();
+   // Check if user is admin or college admin
+  //  if (req.user.role === "admin" || college.admin?.toString() === req.user.id) {
+  //   next();
+  // } else {
+  //   return res.status(403).json({ error: "Admin or college admin access required." });
+  
 };
