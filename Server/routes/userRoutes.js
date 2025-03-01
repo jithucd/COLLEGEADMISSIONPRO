@@ -13,6 +13,6 @@ router.put("/profile", authenticate, userController.updateProfile);
 
 // Upload profile picture
 router.post("/upload-profile-picture", upload.single("image"), userController.uploadProfilePicture);
-
+router.get('/me', authenticate, userController.getProfile);
 
 module.exports = router;

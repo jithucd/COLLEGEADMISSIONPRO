@@ -4,7 +4,7 @@ const User = require("../models/User");
 // Get user profile
 exports.getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(req.user.id).select("-password").populate('college');
     res.json(user);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch profile" });

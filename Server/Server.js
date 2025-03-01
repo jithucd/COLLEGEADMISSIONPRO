@@ -22,9 +22,12 @@ connectDB();
 const logger = require("./config/logger");
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: "http://localhost:5173" }));
 app.use(express.json());
-app.use(logger);
+app.use((req, res, next) => {
+  logger.info(`${req.method} ${req.url}`); // ✅ Correct logging middleware
+  next();
+});
 app.use("/api/", apiLimiter);
 app.use("/api/auth/login", loginLimiter);
 

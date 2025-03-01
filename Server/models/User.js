@@ -12,6 +12,10 @@ const userSchema = new mongoose.Schema(
       default: "student",
     },
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
+    college: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'College'
+    }
   },
   { timestamps: true } // Adds createdAt and updatedAt fields
 );

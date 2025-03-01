@@ -35,26 +35,17 @@ exports.isAdmin = (req, res, next) => {
   next();
 };
 
-// Check if user is a college admin for a specific college
+
 exports.isCollegeAdmin = async (req, res, next) => {
-  const { collegeId } = req.params.id;
-
-  // Find the college
-  const college = await College.findById(collegeId);
-  if (!college) {
-    return res.status(404).json({ error: "College not found." });
+  try {
+    const {id:collegeId } = req.params;
+    const college = await College.findById(collegeId);
+    if (!college) return res.status(404).json({ error: "College not found." });
+    if (college.admin.toString() !== req.user.id) {
+      return res.status(403).json({ error: "Unauthorized action." });
+    }
+    next();
+  } catch (err) {
+    res.status(500).json({ error: "Server error." });
   }
-
-  // Check if the logged-in user is the admin of this college
-  if (college.admin.toString() !== req.user.id) {
-    return res.status(403).json({ error: "Access denied. College admin role required." });
-  }
-
-  next();
-   // Check if user is admin or college admin
-  //  if (req.user.role === "admin" || college.admin?.toString() === req.user.id) {
-  //   next();
-  // } else {
-  //   return res.status(403).json({ error: "Admin or college admin access required." });
-  
 };

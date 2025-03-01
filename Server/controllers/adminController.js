@@ -1,9 +1,11 @@
 const User = require("../models/User");
 const College = require("../models/College");
+const Course = require("../models/Course");
 
 // Get all users
 exports.getAllUsers = async (req, res) => {
   try {
+    console.log("Fetching users..."); 
     const users = await User.find().select("-password");
     res.json(users);
   } catch (err) {
@@ -31,5 +33,49 @@ exports.createCollege = async (req, res) => {
     res.status(201).json({ success: true, college });
   } catch (err) {
     res.status(500).json({ error: "Failed to create college" });
+  }
+};
+exports.updateUserRole = async (req, res) => {
+  try {
+      
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { role: req.body.role },
+      { new: true }
+    ).select("-password");
+    
+    res.json({ success: true, user });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update user role" });
+  }
+};
+
+exports.approveCollege = async (req, res) => {
+  try {
+    
+    const college = await College.findByIdAndUpdate(
+      req.params.id,
+      { approved: true },
+      { new: true }
+    );
+    res.json({ success: true, college });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to approve college" });
+  }
+};
+
+exports.getAdminStats = async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalColleges = await College.countDocuments();
+    const totalCourses = await Course.countDocuments();
+    
+    res.json({
+      totalUsers,
+      totalColleges,
+      totalCourses
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch statistics" });
   }
 };

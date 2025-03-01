@@ -1,18 +1,37 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-
-const paymentSchema = new mongoose.Schema(
-  {
-    admission: { type: mongoose.Schema.Types.ObjectId, ref: "Admission", required: true },
-    amount: { type: Number, required: true },
-    transactionId: { type: String, required: true }, // Payment gateway ID
-    status: {
-      type: String,
-      enum: ["pending", "success", "failed"],
-      default: "pending",
-    },
+const PaymentSchema = new mongoose.Schema({
+  razorpay_order_id: {
+    type: String,
+    required: true
   },
-  { timestamps: true }
-);
+  razorpay_payment_id: {
+    type: String,
+    required: true
+  },
+  razorpay_signature: {
+    type: String,
+    required: true
+  },
+  amount: {
+    type: Number,
+    required: true
+  },
+  currency: {
+    type: String,
+    default: 'INR'
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'successful', 'failed'],
+    default: 'pending'
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  // Add other fields as needed
+}, { timestamps: true });
 
-module.exports = mongoose.model("Payment", paymentSchema);
+module.exports = mongoose.model('Payment', PaymentSchema);

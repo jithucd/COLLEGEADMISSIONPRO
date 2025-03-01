@@ -11,11 +11,11 @@ const SuperAdminLogin = () => {
     e.preventDefault();
     try {
       const response = await login({ email, password });
-      if (response.user.role === "superadmin") {
+      if (response.user.role === "admin") {
         localStorage.setItem("token", response.token);
-        navigate("/superadmin-dashboard");
+        navigate("/admin-dashboard");
       } else {
-        alert("You are not authorized as a super admin.");
+        alert("You are not authorized as an admin.");
       }
     } catch (error) {
       alert("Login failed!");
@@ -24,7 +24,7 @@ const SuperAdminLogin = () => {
 
   return (
     <div>
-      <h1>Super Admin Login</h1>
+      <h1>Admin Login</h1>
       <form onSubmit={handleSubmit}>
         <input
           type="email"

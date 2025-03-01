@@ -13,8 +13,9 @@ exports.getAllColleges = async (req, res) => {
 // Get a single college by ID
 exports.getCollegeById = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params.id;
     const college = await College.findById(id).populate("courses");
+    if (!college) return res.status(404).json({ error: "College not found" });
     res.json(college);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch college" });
@@ -38,6 +39,7 @@ exports.addCourse = async (req, res) => {
 
     res.status(201).json({ success: true, course });
   } catch (err) {
+    console.error("Error adding course:", err);
     res.status(500).json({ error: "Failed to add course" });
   }
 };
