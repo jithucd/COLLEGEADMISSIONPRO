@@ -3,6 +3,10 @@ const Admission = require("../models/Admission");
 
 exports.getAdmissions = async (req, res) => {
   try {
+
+    const college = await College.findOne({ admin: req.user.id });
+    if (!college) return res.status(404).json({ error: "College not found" });
+    
     // Get admissions for the college the admin is associated with
     const admissions = await Admission.find({ college: req.user.college })
       .populate('user course college');

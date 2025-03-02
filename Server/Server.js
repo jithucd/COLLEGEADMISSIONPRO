@@ -11,7 +11,7 @@ const courseRoutes = require("./routes/courseRoutes");
 const userRoutes = require("./routes/userRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const cloudinary = require("./config/cloudinary");
-
+const admissionRoutes = require("./routes/admissionRoutes");
 
 dotenv.config();
 const app = express();
@@ -24,6 +24,7 @@ const logger = require("./config/logger");
 // Middleware
 app.use(cors({ origin: "http://localhost:5173" }));
 app.use(express.json());
+app.use("/api/admissions", admissionRoutes);
 app.use((req, res, next) => {
   logger.info(`${req.method} ${req.url}`); // ✅ Correct logging middleware
   next();

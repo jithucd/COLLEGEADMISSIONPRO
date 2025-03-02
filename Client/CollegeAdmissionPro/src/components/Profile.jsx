@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Container, Form, Button, Alert, Row, Col, Image } from "react-bootstrap";
-import { getProfile, updateProfile, uploadProfilePicture } from "/src/services/user";
+import { getProfile, updateProfile, uploadProfilePicture } from "../services/user";
 
 const Profile = () => {
   const [profile, setProfile] = useState({
@@ -19,20 +19,20 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-        try {
-          const token = localStorage.getItem("token");
-          if (!token) return;
-          
-          const userData = await getProfile(); // Remove the token argument
-          setProfile(userData);
-          setUpdateData({
-            name: userData.name,
-            email: userData.email
-          });
-        } catch (error) {
-          setMessage({ type: "danger", text: "Failed to load profile" });
-        }
-      };
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        const userData = await getProfile();
+        setProfile(userData);
+        setUpdateData({
+          name: userData.name,
+          email: userData.email
+        });
+      } catch (error) {
+        setMessage({ type: "danger", text: "Failed to load profile" });
+      }
+    };
 
     fetchProfile();
   }, []);
@@ -40,9 +40,7 @@ const Profile = () => {
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token");
-      const response = await updateProfile(updateData, token);
-      
+      const response = await updateProfile(updateData);
       setProfile(response.user);
       setMessage({ type: "success", text: "Profile updated successfully" });
       setIsEditing(false);
@@ -63,11 +61,10 @@ const Profile = () => {
 
     try {
       setIsUploading(true);
-      const token = localStorage.getItem("token");
       const formData = new FormData();
       formData.append("image", selectedFile);
-      
-      const response = await uploadProfilePicture(formData, token);
+
+      const response = await uploadProfilePicture(formData);
       setProfile({ ...profile, profilePicture: response.imageUrl });
       setMessage({ type: "success", text: "Profile picture uploaded successfully" });
     } catch (error) {
@@ -90,40 +87,24 @@ const Profile = () => {
       <Row className="mt-4">
         <Col md={4} className="text-center mb-4">
           {profile.profilePicture ? (
-            <Image 
-              src={profile.profilePicture} 
-              roundedCircle 
-              style={{ width: "200px", height: "200px", objectFit: "cover" }} 
-            />
+            <Image src={profile.profilePicture} roundedCircle style={{ width: "200px", height: "200px", objectFit: "cover" }} />
           ) : (
-            <div 
-              className="bg-secondary rounded-circle mx-auto d-flex align-items-center justify-content-center"
-              style={{ width: "200px", height: "200px" }}
-            >
+            <div className="bg-secondary rounded-circle mx-auto d-flex align-items-center justify-content-center" style={{ width: "200px", height: "200px" }}>
               <span className="text-white h1">{profile.name?.charAt(0).toUpperCase()}</span>
             </div>
           )}
-          
+
           <div className="mt-3">
             <Form.Group controlId="profilePicture">
               <Form.Label>Update Profile Picture</Form.Label>
-              <Form.Control 
-                type="file" 
-                onChange={handleFileChange}
-                accept="image/*"
-              />
+              <Form.Control type="file" onChange={handleFileChange} accept="image/*" />
             </Form.Group>
-            <Button 
-              variant="primary" 
-              onClick={handleUpload} 
-              className="mt-2"
-              disabled={isUploading || !selectedFile}
-            >
+            <Button variant="primary" onClick={handleUpload} className="mt-2" disabled={isUploading || !selectedFile}>
               {isUploading ? "Uploading..." : "Upload"}
             </Button>
           </div>
         </Col>
-        
+
         <Col md={8}>
           {isEditing ? (
             <Form onSubmit={handleUpdateProfile}>
@@ -136,7 +117,7 @@ const Profile = () => {
                   required
                 />
               </Form.Group>
-              
+
               <Form.Group controlId="email" className="mb-3">
                 <Form.Label>Email</Form.Label>
                 <Form.Control
@@ -146,14 +127,10 @@ const Profile = () => {
                   required
                 />
               </Form.Group>
-              
+
               <div className="d-flex gap-2">
-                <Button variant="primary" type="submit">
-                  Save Changes
-                </Button>
-                <Button variant="secondary" onClick={() => setIsEditing(false)}>
-                  Cancel
-                </Button>
+                <Button variant="primary" type="submit">Save Changes</Button>
+                <Button variant="secondary" onClick={() => setIsEditing(false)}>Cancel</Button>
               </div>
             </Form>
           ) : (
@@ -161,9 +138,7 @@ const Profile = () => {
               <p><strong>Name:</strong> {profile.name}</p>
               <p><strong>Email:</strong> {profile.email}</p>
               <p><strong>Role:</strong> {profile.role || "Student"}</p>
-              <Button variant="primary" onClick={() => setIsEditing(true)}>
-                Edit Profile
-              </Button>
+              <Button variant="primary" onClick={() => setIsEditing(true)}>Edit Profile</Button>
             </div>
           )}
         </Col>

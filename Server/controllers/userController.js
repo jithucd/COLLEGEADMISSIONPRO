@@ -28,25 +28,20 @@ exports.updateProfile = async (req, res) => {
 
 exports.uploadProfilePicture = async (req, res) => {
   try {
-    const file = req.file; // File from multer middleware
+    if (!req.file || !req.file.path) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
 
-    // Upload to Cloudinary
-    const result = await cloudinary.uploader.upload(file.path, {
-      folder: "profile-pictures", // Optional: Organize files in folders
-    });
-
-    
     // Save Cloudinary URL to user profile
-    const user = await User.findById(req.user.id);
-    user.profilePicture = result.secure_url;
-    await user.save();
+    req.user.profilePicture = req.file.path;
+    await req.user.save();
 
-
-    res.json({ success: true, imageUrl: result.secure_url });
-  } catch (err) {
+    res.json({ success: true, imageUrl: req.file.path });
+  } catch (error) {
     res.status(500).json({ error: "Failed to upload image" });
   }
 };
+
 exports.removeFromFavorites = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
