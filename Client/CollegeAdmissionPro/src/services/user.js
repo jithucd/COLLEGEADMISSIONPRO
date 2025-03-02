@@ -25,3 +25,14 @@ export const uploadProfilePicture = async (formData, token) => {
   });
   return response.data;
 };
+
+export const removeFromFavorites = async (courseId, token) => {
+  try {
+    const response = await axios.delete(`${API_URL}/favorites/${courseId}`, {
+      headers: { Authorization: `Bearer ${token}` } 
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || "Failed to remove from favorites");
+  }
+};

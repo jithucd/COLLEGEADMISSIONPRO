@@ -8,7 +8,7 @@ const Home = () => {
     <Container maxWidth="lg" sx={{ mt: 4 }}>
       <Paper elevation={3} sx={{ p: 4, mb: 4, textAlign: 'center' }}>
         <Typography variant="h3" gutterBottom>
-          Welcome to the College Management System
+          Welcome to the Services Management System
         </Typography>
         <Typography variant="subtitle1">
           Explore colleges and courses!

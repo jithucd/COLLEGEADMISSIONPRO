@@ -47,3 +47,13 @@ exports.uploadProfilePicture = async (req, res) => {
     res.status(500).json({ error: "Failed to upload image" });
   }
 };
+exports.removeFromFavorites = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    user.favorites = user.favorites.filter(fav => fav.toString() !== req.params.courseId);
+    await user.save();
+    res.json({ success: true, message: "Course removed from favorites" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to remove from favorites" });
+  }
+};
