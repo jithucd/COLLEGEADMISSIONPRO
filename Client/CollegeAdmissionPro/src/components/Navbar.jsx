@@ -29,7 +29,7 @@ const NavigationBar = () => {
   return (
     <Navbar bg="dark" variant="dark" expand="lg">
       <Container>
-        <Navbar.Brand as={Link} to="/">College Admission Pro</Navbar.Brand>
+        <Navbar.Brand as={Link} to="/"> Services Management System</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">

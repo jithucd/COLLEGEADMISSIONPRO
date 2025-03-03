@@ -22,7 +22,7 @@ export const getProfile = async () => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
   
-  const response = await fetch("/api/users/me", {
+  const response = await fetch(`${API_URL}/profile`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -48,13 +48,29 @@ export const uploadProfilePicture = async (formData, token) => {
   return response.data;
 };
 
-export const removeFromFavorites = async (courseId, token) => {
+export const removeFromFavorites = async (courseId) => {
+  const token = localStorage.getItem("token"); // ✅ Ensure token is retrieved
+  if (!token) throw new Error("No token found. Please log in again.");
+
   try {
-    const response = await axios.delete(`${API_URL}/favorites/${courseId}`, {
-      headers: { Authorization: `Bearer ${token}` } 
+    const response = await fetch(`http://localhost:5000/api/users/favorites/${courseId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // ✅ Ensure correct format
+      },
     });
-    return response.data;
+
+    if (response.status === 401) {
+      localStorage.removeItem("token"); // ✅ Clear invalid token
+      window.location.href = "/login"; // Redirect to login
+      throw new Error("Session expired. Please log in again.");
+    }
+
+    const data = await response.json();
+    return data;
   } catch (error) {
-    throw new Error(error.response?.data?.error || "Failed to remove from favorites");
+    console.error("Error removing favorite:", error.message);
+    throw error;
   }
 };

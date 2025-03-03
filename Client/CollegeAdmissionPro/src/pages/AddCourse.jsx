@@ -34,7 +34,7 @@ const AddCourse = () => {
         ...formData,
         fees: parseFloat(formData.fees)
       }, token);
-      
+      alert("Course added successfully!");
       navigate(`/colleges/${collegeId}`);
     } catch (err) {
       setError(err.message || "Failed to add course");

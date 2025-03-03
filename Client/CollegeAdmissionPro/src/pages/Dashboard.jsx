@@ -1,24 +1,34 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Table, Alert, Button } from "react-bootstrap";
 import { getProfile, removeFromFavorites } from "../services/user";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isClient, setIsClient] = useState(false);
+  const navigate = useNavigate();
 
-  // Fetch user profile data
   useEffect(() => {
+    setIsClient(true);
+
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
           setError("You need to be logged in to view this page");
+          setLoading(false);
           return;
         }
 
         const data = await getProfile();
         setUserData(data);
+
+        // ✅ Redirect if user is not a student
+        if (data.role === "admin" || data.role === "college_admin") {
+          navigate("/admin-dashboard"); // 🔹 Redirect to admin dashboard
+        }
       } catch (err) {
         setError("Failed to load user data");
       } finally {
@@ -27,30 +37,10 @@ const Dashboard = () => {
     };
 
     fetchUserData();
-  }, []);
+  }, [navigate]);
 
-  // Handle removing a course from favorites
-  const handleRemoveFavorite = async (courseId) => {
-    if (!courseId) {
-      setError("Invalid course ID");
-      return;
-    }
+  if (!isClient) return null; // ✅ Prevents hydration error
 
-    try {
-      const token = localStorage.getItem("token");
-      await removeFromFavorites(courseId, token);
-
-      // Update local state to remove the course from favorites
-      setUserData((prev) => ({
-        ...prev,
-        favorites: prev?.favorites?.filter((course) => course._id !== courseId) || [],
-      }));
-    } catch (err) {
-      setError("Failed to remove from favorites");
-    }
-  };
-
-  // Loading state
   if (loading) {
     return (
       <Container className="py-5">
@@ -59,7 +49,6 @@ const Dashboard = () => {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <Container className="py-5">
@@ -68,13 +57,21 @@ const Dashboard = () => {
     );
   }
 
+  // ✅ Render student dashboard only if role is "student"
+  if (userData?.role !== "student") {
+    return (
+      <Container className="py-5">
+        <Alert variant="warning">Access Denied: You are not a student.</Alert>
+      </Container>
+    );
+  }
+
   return (
     <Container className="py-4">
       <h1>Welcome, {userData?.name}!</h1>
-      <p className="lead">{userData?.role} Dashboard</p>
+      <p className="lead">Student Dashboard</p>
 
       <Row className="mt-4">
-        {/* Profile Section */}
         <Col md={4} className="mb-4">
           <Card>
             <Card.Body>
@@ -90,7 +87,6 @@ const Dashboard = () => {
           </Card>
         </Col>
 
-        {/* Favorites Section */}
         <Col md={8}>
           <Card>
             <Card.Body>
@@ -107,9 +103,8 @@ const Dashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {userData.favorites
-                      ?.filter(Boolean) // Ensure no null/undefined entries
-                      .map((course) => (
+                    {userData.favorites.map((course) =>
+                      course && course._id ? (
                         <tr key={course._id}>
                           <td>{course.title}</td>
                           <td>{course.college?.name || "N/A"}</td>
@@ -125,11 +120,12 @@ const Dashboard = () => {
                             </Button>
                           </td>
                         </tr>
-                      ))}
+                      ) : null
+                    )}
                   </tbody>
                 </Table>
               ) : (
-                <p>You haven't added any courses to your favorites yet.</p>
+                <p>No favorite courses found.</p>
               )}
             </Card.Body>
           </Card>

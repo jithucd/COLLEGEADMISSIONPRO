@@ -28,7 +28,7 @@ exports.addCourse = async (req, res) => {
     const { id } = req.params;
     const { title, description, fees, duration } = req.body;
 
-    const college = await College.findById(id);
+    const college = await College.findById(req.params.collegeId);
     if (!college) {
       return res.status(404).json({ error: "College not found" });
     }

@@ -13,14 +13,18 @@ const CollegeDetail = () => {
   useEffect(() => {
     const fetchCollege = async () => {
       try {
-        setLoading(true);
-        const data = await getCollegeById(id);
-        setCollege(data);
-      } catch (err) {
-        setError("Failed to load college details");
-        console.error(err);
-      } finally {
-        setLoading(false);
+        const { id } = useParams(); // ✅ Ensure ID comes from route params
+        if (!id) {
+          setError("Invalid College ID");
+          return;
+        }
+    
+        const response = await getCollegeById(id);
+        if (!response) throw new Error("College not found");
+    
+        setCollege(response);
+      } catch (error) {
+        setError(error.message);
       }
     };
 
