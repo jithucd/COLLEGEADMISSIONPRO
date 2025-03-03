@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Table, Alert, Button } from "react-bootstrap";
 import { getProfile, removeFromFavorites } from "../services/user";
 import { useNavigate } from "react-router-dom";
-
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -10,6 +11,12 @@ const Dashboard = () => {
   const [isClient, setIsClient] = useState(false);
   const navigate = useNavigate();
 
+  const handleApplyNow = (courseId) => {
+    toast.info("Redirecting to admission page...", {
+      autoClose: 2000,
+      onClose: () => navigate(`/admission/${courseId}`),
+    });
+  };
   useEffect(() => {
     setIsClient(true);
 
@@ -114,10 +121,17 @@ const Dashboard = () => {
                             <Button
                               variant="danger"
                               size="sm"
-                              onClick={() => handleRemoveFavorite(course._id)}
+                              onClick={() => removeFromFavorites(course._id)}
                             >
                               Remove
                             </Button>
+                            <Button
+                          variant="success"
+                          size="sm"
+                          onClick={() => handleApplyNow(course._id)}
+                        >
+                          Apply Now
+                        </Button>
                           </td>
                         </tr>
                       ) : null

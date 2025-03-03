@@ -8,8 +8,8 @@ import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import SuperAdminLogin from "./pages/SuperAdminLogin";
-import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+// import SuperAdminLogin from "./pages/SuperAdminLogin";
+// import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import { Container } from "react-bootstrap";
 import AdmissionPage from "./pages/AdmissionPage";
 import AdmissionStatus from "./components/AdmissionStatus";
@@ -25,8 +25,8 @@ function App() {
       <Navbar />
       <Container className="mt-4">
       <Routes>
-      <Route path="/superadmin-login" element={<SuperAdminLogin />} />
-      <Route path="/superadmin-dashboard" element={<SuperAdminDashboard />} />
+      {/* <Route path="/superadmin-login" element={<SuperAdminLogin />} />
+      <Route path="/superadmin-dashboard" element={<SuperAdminDashboard />} /> */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
@@ -40,6 +40,7 @@ function App() {
  <Route path="/colleges/:id" element={<CollegeDetail />} />
  <Route path="/add-course" element={<AddCourse />} />
  <Route path="/profile" element={<ProfilePage />} />
+     
       </Routes>
       </Container>
       <Footer />

@@ -4,7 +4,7 @@ const API_URL = "http://localhost:5000/api";
 
 export const getAllColleges = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/admin/colleges");
+    const response = await axios.get("http://localhost:5000/api/colleges");
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.error || "Failed to fetch colleges");

@@ -15,8 +15,8 @@ exports.createPaymentOrder = async (req, res) => {
     const options = {
       amount: amount * 100, // Razorpay expects amount in paise
       currency: "INR",
-      receipt: `receipt_${admissionId}`,
-      notes:notes
+      receipt: `receipt_${admissionId}`
+    
     };
 
 

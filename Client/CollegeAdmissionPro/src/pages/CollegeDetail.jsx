@@ -13,7 +13,7 @@ const CollegeDetail = () => {
   useEffect(() => {
     const fetchCollege = async () => {
       try {
-        const { id } = useParams(); // ✅ Ensure ID comes from route params
+        
         if (!id) {
           setError("Invalid College ID");
           return;

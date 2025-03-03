@@ -1,5 +1,6 @@
 // server/routes/adminRoutes.js
 const router = require("express").Router();
+const express = require("express");
 const {authenticate, isAdmin , isCollegeAdmin} = require("../middlewares/authMiddleware");
 const adminController = require("../controllers/adminController");
 const collegeAdminController = require("../controllers/collegeAdminController");
@@ -18,6 +19,6 @@ router.get(
   );
 router.get('/college-admin/admissions', authenticate, isCollegeAdmin, collegeAdminController.getAdmissions);
 router.put('/college-admin/admissions/:id', authenticate, isCollegeAdmin, collegeAdminController.updateAdmissionStatus);
-
+router.get("/colleges", authenticate, isAdmin, adminController.getAllColleges);
 
 module.exports = router;

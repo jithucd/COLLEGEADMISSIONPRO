@@ -79,3 +79,11 @@ exports.getAdminStats = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch statistics" });
   }
 };
+exports.getAllColleges = async (req, res) => {
+  try {
+    const colleges = await College.find();
+    res.json({ success: true, colleges });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch colleges" });
+  }
+};

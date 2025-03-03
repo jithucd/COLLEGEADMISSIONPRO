@@ -49,7 +49,7 @@ export const uploadProfilePicture = async (formData, token) => {
 };
 
 export const removeFromFavorites = async (courseId) => {
-  const token = localStorage.getItem("token"); // ✅ Ensure token is retrieved
+  const token = localStorage.getItem("token");
   if (!token) throw new Error("No token found. Please log in again.");
 
   try {
@@ -57,12 +57,12 @@ export const removeFromFavorites = async (courseId) => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // ✅ Ensure correct format
+        Authorization: `Bearer ${token}`,
       },
     });
 
     if (response.status === 401) {
-      localStorage.removeItem("token"); // ✅ Clear invalid token
+      localStorage.removeItem("token"); 
       window.location.href = "/login"; // Redirect to login
       throw new Error("Session expired. Please log in again.");
     }

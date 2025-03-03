@@ -16,7 +16,7 @@ router.post("/", authenticate, isAdmin, adminController.createCollege);
 // Add a course to a college (admin or college admin)
 // router.post("/:id/courses", authenticate, isCollegeAdmin, courseController.addCourse);
 router.post(
-    "/:Id/courses",
+    "/:id/courses",
     authenticate,
     (req, res, next) => {
       // Allow both admins and college admins
@@ -25,5 +25,5 @@ router.post(
     },
     collegeController.addCourse
   );
-  router.get("/:Id/courses", collegeController.getCourses);
+  router.get("/:id/courses", collegeController.getCourses);
 module.exports = router;
