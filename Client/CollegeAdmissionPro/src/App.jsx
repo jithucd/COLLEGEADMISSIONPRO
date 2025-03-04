@@ -24,24 +24,25 @@ function App() {
     <BrowserRouter>
       <Navbar />
       <Container className="mt-4">
-      <Routes>
-      {/* <Route path="/superadmin-login" element={<SuperAdminLogin />} />
+        <Routes>
+          {/* <Route path="/superadmin-login" element={<SuperAdminLogin />} />
       <Route path="/superadmin-dashboard" element={<SuperAdminDashboard />} /> */}
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/colleges" element={<Colleges />} />
-        <Route path="/courses" element={<Courses />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        <Route path="/admission/:courseId" element={<AdmissionPage />} />
-        <Route path="/admission/:admissionId/status" element={<AdmissionStatus />} />
-        <Route path="/college-admin-dashboard" element={<CollegeAdminDashboard />} />
- <Route path="/colleges/:id" element={<CollegeDetail />} />
- <Route path="/add-course" element={<AddCourse />} />
- <Route path="/profile" element={<ProfilePage />} />
-     
-      </Routes>
+          
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/colleges" element={<Colleges />} />
+          <Route path="/courses" element={<Courses />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/admission/:courseId" element={<AdmissionPage />} />
+          <Route path="/admission/:admissionId/status" element={<AdmissionStatus />} />
+          <Route path="/college-admin-dashboard" element={<CollegeAdminDashboard />} />
+          <Route path="/colleges/:id" element={<CollegeDetail />} />
+          <Route path="/add-course" element={<AddCourse />} />
+          <Route path="/profile" element={<ProfilePage />} />
+
+        </Routes>
       </Container>
       <Footer />
     </BrowserRouter>

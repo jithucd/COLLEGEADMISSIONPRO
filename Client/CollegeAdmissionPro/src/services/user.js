@@ -1,40 +1,56 @@
 import axios from "axios";
+
 const API_URL = "http://localhost:5000/api/users";
 
-// export const getProfile = async () => {
-//   const token = localStorage.getItem("token");
-//   const response = await axios.get(`${API_URL}/me`, {
-//     headers: { Authorization: `Bearer ${token}` }
-//   });
-//   return response.data;
-// };
+export const updateProfile = async (updateData) => {
+  const token = localStorage.getItem("token"); // ✅ Retrieve token
 
-export const updateProfile = async (updateData, token) => {
-  const response = await axios.put(`${API_URL}/profile`, updateData, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  return response.data;
+  if (!token) {
+    throw new Error("No authentication token found. Please log in again.");
+  }
+
+  try {
+    const response = await axios.put(`${API_URL}/profile`, updateData, {
+      headers: { 
+        Authorization: `Bearer ${token}`, // ✅ Ensure token is sent
+        "Content-Type": "application/json",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Profile update failed:", error.response?.data || error.message);
+    throw new Error(error.response?.data?.error || "Failed to update profile");
+  }
 };
 
 
 
 export const getProfile = async () => {
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("No authentication token found");
-  
-  const response = await fetch(`${API_URL}/profile`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const token = localStorage.getItem("token"); // ✅ Get token from localStorage
+  if (!token) throw new Error("No authentication token found. Please log in.");
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch profile");
+  try {
+    const response = await axios.get(`${API_URL}/profile`, {
+      headers: { 
+        Authorization: `Bearer ${token}`, // ✅ Send token
+        "Content-Type": "application/json",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Profile fetch failed:", error.response?.data || error.message);
+
+    // Handle 401 Unauthorized - Logout user if token is invalid
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/login"; // Redirect to login
+      throw new Error("Session expired. Please log in again.");
+    }
+
+    throw new Error(error.response?.data?.error || "Failed to fetch profile");
   }
-  
-  return await response.json();
 };
 
 
@@ -53,23 +69,20 @@ export const removeFromFavorites = async (courseId) => {
   if (!token) throw new Error("No token found. Please log in again.");
 
   try {
-    const response = await fetch(`http://localhost:5000/api/users/favorites/${courseId}`, {
-      method: "DELETE",
+    const response = await axios.delete(`${API_URL}/favorites/${courseId}`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     });
 
-    if (response.status === 401) {
-      localStorage.removeItem("token"); 
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
       window.location.href = "/login"; // Redirect to login
       throw new Error("Session expired. Please log in again.");
     }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
     console.error("Error removing favorite:", error.message);
     throw error;
   }

@@ -1,26 +1,44 @@
 import { useEffect, useState } from "react";
-import { Container, Row, Col, Card, Table, Alert, Button } from "react-bootstrap";
+import { Container, Row, Col, Card, Table, Alert, Button, Spinner } from "react-bootstrap";
 import { getProfile, removeFromFavorites } from "../services/user";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
+
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
+  const [admissions, setAdmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isClient, setIsClient] = useState(false);
   const navigate = useNavigate();
 
   const handleApplyNow = (courseId) => {
-    toast.info("Redirecting to admission page...", {
-      autoClose: 2000,
-      onClose: () => navigate(`/admission/${courseId}`),
-    });
+    if (!courseId) {
+      toast.error("Invalid course ID. Please try again.");
+      return;
+    }
+    navigate(`/admission/${courseId}`);
   };
+
+  const handleRemoveFavorite = async (courseId) => {
+    try {
+      await removeFromFavorites(courseId);
+      setUserData(prev => ({
+        ...prev,
+        favorites: prev.favorites.filter(course => course._id !== courseId)
+      }));
+      toast.success("Removed from favorites");
+    } catch (err) {
+      toast.error("Failed to remove from favorites");
+    }
+  };
+
   useEffect(() => {
     setIsClient(true);
 
-    const fetchUserData = async () => {
+    const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
@@ -29,29 +47,51 @@ const Dashboard = () => {
           return;
         }
 
-        const data = await getProfile();
-        setUserData(data);
+        // Fetch user profile
+        const userData = await getProfile();
+        setUserData(userData);
 
-        // ✅ Redirect if user is not a student
-        if (data.role === "admin" || data.role === "college_admin") {
-          navigate("/admin-dashboard"); // 🔹 Redirect to admin dashboard
+        // Redirect non-students
+        if (userData.role == "admin") {
+          navigate("/admin-dashboard");
+          return;
         }
+        if (userData.role == "college_admin") {
+          navigate("/college-admin-dashboard");
+          return;
+        }
+        // Fetch admissions data
+        const admissionsResponse = await axios.get("http://localhost:5000/api/admissions", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setAdmissions(admissionsResponse.data);
+
+        setLoading(false);
       } catch (err) {
-        setError("Failed to load user data");
+        console.error("Error fetching dashboard data:", err); // Log full error
+
+        // ✅ Properly check if response exists
+        if (err.response) {
+          setError(err.response.data?.error || "Failed to load dashboard data");
+        } else {
+          setError("Network error. Please try again.");
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUserData();
+    fetchData();
   }, [navigate]);
 
-  if (!isClient) return null; // ✅ Prevents hydration error
+  if (!isClient) return null;
 
   if (loading) {
     return (
-      <Container className="py-5">
-        <p>Loading...</p>
+      <Container className="py-5 text-center">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
       </Container>
     );
   }
@@ -64,7 +104,6 @@ const Dashboard = () => {
     );
   }
 
-  // ✅ Render student dashboard only if role is "student"
   if (userData?.role !== "student") {
     return (
       <Container className="py-5">
@@ -95,7 +134,7 @@ const Dashboard = () => {
         </Col>
 
         <Col md={8}>
-          <Card>
+          <Card className="mb-4">
             <Card.Body>
               <Card.Title>Your Favorite Courses</Card.Title>
               {userData?.favorites?.length > 0 ? (
@@ -121,17 +160,19 @@ const Dashboard = () => {
                             <Button
                               variant="danger"
                               size="sm"
-                              onClick={() => removeFromFavorites(course._id)}
+                              onClick={() => handleRemoveFavorite(course._id)}
+                              className="me-2"
                             >
                               Remove
                             </Button>
                             <Button
-                          variant="success"
-                          size="sm"
-                          onClick={() => handleApplyNow(course._id)}
-                        >
-                          Apply Now
-                        </Button>
+                              variant="success"
+                              size="sm"
+                              onClick={() => handleApplyNow(course._id)}
+                              disabled={!course._id}
+                            >
+                              Apply Now
+                            </Button>
                           </td>
                         </tr>
                       ) : null
@@ -143,6 +184,43 @@ const Dashboard = () => {
               )}
             </Card.Body>
           </Card>
+
+          <Card>
+            <Card.Body>
+              <Card.Title>Admission Status</Card.Title>
+              {admissions.length > 0 ? (
+                <Table striped bordered hover>
+                  <thead>
+                    <tr>
+                      <th>Course</th>
+                      <th>College</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {admissions.map((admission) => (
+                      <tr key={admission._id}>
+                        <td>{admission.course?.title || "N/A"}</td>
+                        <td>{admission.college?.name || "N/A"}</td>
+                        <td>
+                          <Alert
+                            variant={admission.status === "approved" ? "success" :
+                              admission.status === "rejected" ? "danger" : "info"}
+                            className="mb-0"
+                          >
+                            {admission.status}
+                          </Alert>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              ) : (
+                <p>No admission applications found.</p>
+              )}
+            </Card.Body>
+          </Card>
+
         </Col>
       </Row>
     </Container>

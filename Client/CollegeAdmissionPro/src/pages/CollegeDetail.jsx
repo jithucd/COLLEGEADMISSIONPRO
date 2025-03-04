@@ -13,21 +13,30 @@ const CollegeDetail = () => {
   useEffect(() => {
     const fetchCollege = async () => {
       try {
-        
+        console.log("Fetching college details for ID:", id); // Debugging
+    
         if (!id) {
           setError("Invalid College ID");
+          setLoading(false);
           return;
         }
     
         const response = await getCollegeById(id);
-        if (!response) throw new Error("College not found");
+        
+        console.log("API Response:", response); // Debugging
+    
+        if (!response || response.error) {
+          throw new Error(response?.error || "College not found");
+        }
     
         setCollege(response);
+        setLoading(false); // ✅ Ensure loading stops
       } catch (error) {
-        setError(error.message);
+        console.error("Error fetching college:", error);
+        setError(error.message || "Failed to load college details");
+        setLoading(false);
       }
     };
-
     fetchCollege();
   }, [id]);
 
@@ -61,7 +70,7 @@ const CollegeDetail = () => {
 
       <h2 className="mb-3">Available Courses</h2>
       
-      {college?.courses?.length > 0 ? (
+      {Array.isArray(college?.courses) && college.courses.length > 0 ? (
         <Row>
           {college.courses.map(course => (
             <Col md={6} key={course._id}>

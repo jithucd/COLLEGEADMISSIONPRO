@@ -4,8 +4,12 @@ const User = require("../models/User");
 // Get user profile
 exports.getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).populate("favorites");
-
+    // const user = await User.findById(req.user.id).populate("favorites");
+    const user = await User.findById(req.user.id)
+    .populate({
+      path: "favorites",
+      populate: { path: "college", select: "name" }
+    });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

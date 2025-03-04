@@ -38,14 +38,18 @@ const NavigationBar = () => {
             
             {isLoggedIn ? (
               <>
-                {userRole === "admin" && (
-                  <Nav.Link as={Link} to="/admin-dashboard">Admin Dashboard</Nav.Link>
+               
+                <NavDropdown title="Account" id="basic-nav-dropdown">
+                 
+                  {userRole === "admin" && (
+                  <NavDropdown.Item as={Link} to="/admin-dashboard">Admin Dashboard</NavDropdown.Item>
                 )}
                 {userRole === "college_admin" && (
-                  <Nav.Link as={Link} to="/college-admin-dashboard">College Dashboard</Nav.Link>
+                  <NavDropdown.Item as={Link} to="/college-admin-dashboard">College Dashboard</NavDropdown.Item>
                 )}
-                <NavDropdown title="Account" id="basic-nav-dropdown">
+                   {userRole === "student" && (
                   <NavDropdown.Item as={Link} to="/dashboard">Dashboard</NavDropdown.Item>
+                )}
                   <NavDropdown.Item as={Link} to="/profile">Profile</NavDropdown.Item>
                   <NavDropdown.Divider />
                   <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>

@@ -1,40 +1,43 @@
-// Client/CollegeAdmissionPro/src/components/AdmissionStatus.jsx
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { getAdmissionStatus } from '../services/admission';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { Container, Spinner, Alert } from "react-bootstrap";
 
 const AdmissionStatus = () => {
   const { admissionId } = useParams();
-  const [admission, setAdmission] = useState(null);
+  const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const data = await getAdmissionStatus(admissionId);
-        setAdmission(data);
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`http://localhost:5000/api/admissions/${admissionId}/status`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setStatus(response.data.status);
       } catch (err) {
-        console.error(err);
+        setError("Failed to fetch admission status.");
       } finally {
         setLoading(false);
       }
     };
+
     fetchStatus();
   }, [admissionId]);
 
+  if (loading) return <Spinner animation="border" />;
+  if (error) return <Alert variant="danger">{error}</Alert>;
+
   return (
-    <div className="p-4">
-      <h3>Admission Status</h3>
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <div>
-          <p>Status: {admission.status}</p>
-          <p>Course: {admission.course.title}</p>
-          {/* Add more details */}
-        </div>
-      )}
-    </div>
+    <Container className="py-4">
+      <h2>Admission Status</h2>
+      <Alert variant={status === "approved" ? "success" : status === "rejected" ? "danger" : "info"}>
+        {status ? `Your admission is ${status}.` : "Pending approval."}
+      </Alert>
+    </Container>
   );
 };
 

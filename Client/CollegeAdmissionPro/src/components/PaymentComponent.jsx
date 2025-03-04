@@ -50,13 +50,14 @@ const PaymentComponent = () => {
       // Initialize Razorpay options
       const options = {
         key: process.env.REACT_APP_RAZORPAY_KEY_ID,
-        amount: data.order.amount,
-        currency: data.order.currency,
-        name: 'Your Company Name',
-        description: 'Test Transaction',
-        order_id: data.order.id,
+        amount:  data.order.amount,
+        currency: "INR",
+        name: 'College Admission Pro',
+        description: 'Course Admission Fee',
+        order_id:  data.order.id,
         handler: async function (response) {
           try {
+            navigate(`/admission/${admission._id}/status`);
             // Verify payment on server
             const verifyData = await axios.post('/api/payments/verify-payment', {
               razorpay_order_id: response.razorpay_order_id,
@@ -85,7 +86,8 @@ const PaymentComponent = () => {
           color: '#3399cc'
         }
       };
-      
+      const rzp = new window.Razorpay(options);
+rzp.open();
       // Create Razorpay instance
       const paymentObject = new window.Razorpay(options);
       paymentObject.open();

@@ -1,78 +1,84 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Form, Button, Alert, Card } from 'react-bootstrap';
-import { createAdmission, createPaymentOrder } from '../services/admission';
+import { Container, Form, Button, Alert, Card, Spinner } from 'react-bootstrap';
+import { createAdmission } from '../services/admission';
 import Loader from '../components/Loader';
 
 const AdmissionPage = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
+    fullName: "",
+    email: "",
+    phone: "",
+    address: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [razorpayKey, setRazorpayKey] = useState('');
 
-  useEffect(() => {
-    // Load from environment variables
-    setRazorpayKey(import.meta.env.REACT_APP_RAZORPAY_KEY_ID);
-  }, []);
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // useEffect(() => {
+  //   setRazorpayKey(process.env.REACT_APP_RAZORPAY_KEY_ID);
+  // }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
+  
     if (!token) {
       setError("Please login to proceed with admission.");
       return;
     }
-
+  
+    if (!formData.fullName || !formData.email || !formData.phone || !formData.address) {
+      setError("All fields are required.");
+      return;
+    }
+  
     setLoading(true);
+    setError(null);
+  
     try {
-      // 1. Create admission
+      console.log("Submitting Admission for Course ID:", courseId);
+  
       const admission = await createAdmission(courseId, formData);
-
-      // 2. Create payment order
-      const order = await createPaymentOrder(admission._id, admission.course.fees);
-
-      // 3. Initialize Razorpay
-      const options = {
-        key: import.meta.env.REACT_APP_RAZORPAY_KEY_ID, // Directly use env var
-        amount: order.amount,
-        currency: "INR",
-        name: "College Admission Pro",
-        description: "Course Admission Fee",
-        order_id: order.id,
-        handler: (response) => {
-          navigate(`/admission/${admission._id}/status`);
-        },
-      };
-
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+      console.log("Admission submitted:", admission);
+  
+      // Show success alert
+      alert("Application sent successfully!");
+  
+      // Navigate to the Dashboard's Application Status after a short delay
+      setTimeout(() => {
+        navigate("/dashboard"); // Change this to the correct route
+      }, 1500);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to submit application.");
     } finally {
       setLoading(false);
     }
   };
+  
+
 
   return (
     <Container className="my-5">
       <Card className="p-4">
         <h2>Admission Application</h2>
         {error && <Alert variant="danger">{error}</Alert>}
-        
+
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
             <Form.Label>Full Name</Form.Label>
-            <Form.Control 
-              type="text" 
+            <Form.Control
+              type="text"
+              name="fullName"
               required
               value={formData.fullName}
-              onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+              onChange={handleChange}
             />
           </Form.Group>
 
@@ -80,9 +86,10 @@ const AdmissionPage = () => {
             <Form.Label>Email</Form.Label>
             <Form.Control
               type="email"
+              name="email"
               required
               value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              onChange={handleChange}
             />
           </Form.Group>
 
@@ -90,14 +97,25 @@ const AdmissionPage = () => {
             <Form.Label>Phone</Form.Label>
             <Form.Control
               type="tel"
+              name="phone"
               required
               value={formData.phone}
-              onChange={(e) => setFormData({...formData, phone: e.target.value})}
+              onChange={handleChange}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Address</Form.Label>
+            <Form.Control
+              type="text"
+              name="address"
+              required
+              value={formData.address}
+              onChange={handleChange}
             />
           </Form.Group>
 
-          <Button variant="primary" type="submit" disabled={loading}>
-            {loading ? <Loader size="sm" /> : 'Proceed to Payment'}
+          <Button type="submit" variant="primary" disabled={loading}>
+            {loading ? <Spinner animation="border" size="sm" /> : "Submit Application"}
           </Button>
         </Form>
       </Card>

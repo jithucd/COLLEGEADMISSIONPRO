@@ -48,7 +48,7 @@ const Signup = () => {
           <Form.Label>Role</Form.Label>
           <Form.Select value={role} onChange={(e) => setRole(e.target.value)}>
             <option value="student">Student</option>
-            <option value="admin">Admin</option>
+            <option value="college_admin">College Admin</option>
           </Form.Select>
         </Form.Group>
 
