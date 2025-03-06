@@ -4,13 +4,13 @@ const College = require("../models/College");
 
 exports.authenticate = async (req, res, next) => {
   try {
-    
+
     const token = req.header("Authorization")?.split(" ")[1];
 
     if (!token) {
       return res.status(401).json({ error: "Access denied. No token provided." });
     }
-/*  */
+    /*  */
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -29,7 +29,7 @@ exports.authenticate = async (req, res, next) => {
 
 // Check if user is an admin
 exports.isAdmin = (req, res, next) => {
-  if (req.user.role !== "admin") {
+  if (req.user.role !== "admin" || !req.user) {
     return res.status(403).json({ error: "Access denied. Admin role required." });
   }
   next();
@@ -38,7 +38,7 @@ exports.isAdmin = (req, res, next) => {
 
 exports.isCollegeAdmin = async (req, res, next) => {
   try {
-    const {id:collegeId } = req.params;
+    const { id: collegeId } = req.params;
     const college = await College.findById(collegeId);
     if (!college) return res.status(404).json({ error: "College not found." });
     if (college.admin.toString() !== req.user.id) {

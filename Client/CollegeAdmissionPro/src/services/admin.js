@@ -1,10 +1,10 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/admin";
+const API_URL = "http://localhost:5000/api";
 
 export const getAllUsers = async (token) => {
   try {
-    const response = await axios.get(`${API_URL}/users`, {
+    const response = await axios.get(`${API_URL}/admin/users`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
@@ -52,11 +52,12 @@ export const getAllColleges = async (token) => {
 
 export const deleteUser = async (userId, token) => {
   try {
-    const response = await axios.delete(`${API_URL}/users/${userId}`, {
+    const response = await axios.delete(`${API_URL}/admin/users/${userId}`, { 
       headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
   } catch (error) {
+    console.error("Delete User API Error:", error.response?.data);
     throw new Error(error.response?.data?.error || "Failed to delete user");
   }
 };
@@ -85,27 +86,27 @@ export const createCollege = async (collegeData, token) => {
   }
 };
 export const approveCollege = async (collegeId) => {
-  const response = await axios.put(`/api/admin/colleges/${collegeId}/approve`);
+  const response = await axios.put(`/admin/colleges/${collegeId}/approve`);
   return response.data;
 };
 
 export const updateUserRole = async (userId, newRole) => {
-  const response = await axios.put(`/api/admin/users/${userId}/role`, { role: newRole });
+  const response = await axios.put(`/admin/users/${userId}/role`, { role: newRole });
   return response.data;
 };
 
 export const getAdminStats = async () => {
-  const response = await axios.get('/api/admin/stats');
+  const response = await axios.get('/admin/stats');
   return response.data;
 };
 
 // College Admin Services
 export const getCollegeAdmissions = async () => {
-  const response = await axios.get('/api/college-admin/admissions');
+  const response = await axios.get('/college-admin/admissions');
   return response.data;
 };
 
 export const updateAdmissionStatus = async (admissionId, status) => {
-  const response = await axios.put(`/api/college-admin/admissions/${admissionId}`, { status });
+  const response = await axios.put(`/college-admin/admissions/${admissionId}`, { status });
   return response.data;
 };

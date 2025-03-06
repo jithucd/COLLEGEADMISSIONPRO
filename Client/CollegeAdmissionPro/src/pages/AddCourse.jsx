@@ -10,17 +10,19 @@ const AddCourse = () => {
     title: "",
     description: "",
     fees: "",
-    duration: ""
+    duration: "",
+    collegeId:collegeId,
+    
   });
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -32,6 +34,7 @@ const AddCourse = () => {
       const token = localStorage.getItem("token");
       await addCourse(collegeId, {
         ...formData,
+        collegeId,
         fees: parseFloat(formData.fees)
       }, token);
       alert("Course added successfully!");

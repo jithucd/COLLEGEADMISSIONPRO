@@ -20,10 +20,10 @@ router.post(
     authenticate,
     (req, res, next) => {
       // Allow both admins and college admins
-      if (req.user.role === "admin") return next();
+      if (req.user.role === "admin"|| req.user.role === "college_admin") return next();
       isCollegeAdmin(req, res, next);
     },
-    collegeController.addCourse
+    courseController.addCourse
   );
   router.get("/:id/courses", collegeController.getCourses);
 module.exports = router;

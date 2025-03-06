@@ -8,6 +8,14 @@ exports.addCourse = async (req, res) => {
     const { title, description, fees, duration, collegeId } = req.body;
     const user = req.user; // From auth middleware
 
+     // Auto-assign collegeId for college admins
+     if (user.role === "college_admin") {
+      if (!user.college) {
+        return res.status(403).json({ error: "You are not assigned to any college." });
+      }
+      collegeId = user.college.toString(); // ✅ Set collegeId from user profile
+    }
+
     // Validate input
     if (!title || !fees || !duration || !collegeId) {
       return res.status(400).json({ error: "Missing required fields" });
@@ -41,6 +49,7 @@ exports.addCourse = async (req, res) => {
 
     res.status(201).json({ success: true, course });
   } catch (err) {
+    console.error("Error adding course:", err);
     res.status(500).json({ error: "Failed to add course" });
   }
 };

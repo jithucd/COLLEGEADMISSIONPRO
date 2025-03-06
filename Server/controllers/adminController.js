@@ -17,14 +17,20 @@ exports.getAllUsers = async (req, res) => {
 // Delete a user
 exports.deleteUser = async (req, res) => {
   try {
-    const { id } = req.params;
-    await User.findByIdAndDelete(id);
-    res.json({ success: true, message: "User deleted successfully" });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to delete user" });
+      console.log("Delete request for user ID:", req.params.userId);
+      const user = await User.findById(req.params.userId);
+      
+      if (!user) {
+          return res.status(404).json({ error: "User not found" });
+      }
+
+      await User.findByIdAndDelete(req.params.userId);
+      res.json({ message: "User deleted successfully" });
+  } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ error: "Something went wrong!" });
   }
 };
-
 // Create a college
 exports.createCollege = async (req, res) => {
   try {

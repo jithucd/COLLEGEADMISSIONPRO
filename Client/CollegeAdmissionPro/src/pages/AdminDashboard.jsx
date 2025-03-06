@@ -39,7 +39,8 @@ const AdminDashboard = () => {
         setUsers(users.filter(user => user._id !== userId));
         setMessage({ type: "success", text: "User deleted successfully" });
       } catch (err) {
-        setMessage({ type: "danger", text: "Failed to delete user" });
+        console.error("Error deleting user:", err);
+        setMessage({ type: "danger", text: err.message || "Failed to delete user" });
       }
     }
   };
@@ -66,7 +67,7 @@ const AdminDashboard = () => {
         // Handle error
       }
     };
-  
+
     return (
       <Card className="mb-4">
         <Card.Body>
@@ -79,8 +80,8 @@ const AdminDashboard = () => {
                   <tr key={college._id}>
                     <td>{college.name}</td>
                     <td>
-                      <Button 
-                        variant="success" 
+                      <Button
+                        variant="success"
                         size="sm"
                         onClick={() => handleApprove(college._id)}
                       >
@@ -95,7 +96,7 @@ const AdminDashboard = () => {
       </Card>
     );
   };
-  
+
   // User Role Management
   const UserRoleManager = ({ users }) => {
     const handleRoleChange = async (userId, newRole) => {
@@ -106,7 +107,7 @@ const AdminDashboard = () => {
         // Handle error
       }
     };
-  
+
     return (
       <Table striped>
         <thead>
@@ -122,8 +123,8 @@ const AdminDashboard = () => {
               <td>{user.name}</td>
               <td>{user.email}</td>
               <td>
-                <Form.Select 
-                  value={user.role} 
+                <Form.Select
+                  value={user.role}
                   onChange={(e) => handleRoleChange(user._id, e.target.value)}
                 >
                   <option value="student">Student</option>
@@ -137,11 +138,11 @@ const AdminDashboard = () => {
       </Table>
     );
   };
-  
+
   return (
     <Container className="py-4">
       <h1>Admin Dashboard</h1>
-      
+
       {error && <Alert variant="danger">{error}</Alert>}
       {message.text && (
         <Alert variant={message.type} dismissible onClose={() => setMessage({ type: "", text: "" })}>
@@ -154,7 +155,7 @@ const AdminDashboard = () => {
           <div className="d-flex justify-content-between mb-3">
             <h3>System Users</h3>
           </div>
-          
+
           <Table striped bordered hover responsive>
             <thead>
               <tr>
@@ -171,9 +172,9 @@ const AdminDashboard = () => {
                   <td>{user.email}</td>
                   <td>{user.role}</td>
                   <td>
-                    <Button 
-                      variant="danger" 
-                      size="sm" 
+                    <Button
+                      variant="danger"
+                      size="sm"
                       onClick={() => handleDeleteUser(user._id)}
                     >
                       Delete
@@ -184,13 +185,13 @@ const AdminDashboard = () => {
             </tbody>
           </Table>
         </Tab>
-        
+
         <Tab eventKey="colleges" title="Colleges">
           <div className="d-flex justify-content-between mb-3">
             <h3>Colleges</h3>
             <Button onClick={() => setShowAddCollegeModal(true)}>Add New College</Button>
           </div>
-          
+
           <Table striped bordered hover responsive>
             <thead>
               <tr>
@@ -201,30 +202,36 @@ const AdminDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {colleges.map((college) => (
-                <tr key={college._id}>
-                  <td>{college.name}</td>
-                  <td>{college.location}</td>
-                  <td>{college.courses?.length || 0}</td>
-                  <td>
-                    <Button 
-                      variant="info" 
-                      size="sm" 
-                      href={`/colleges/${college._id}`}
-                      className="me-2"
-                    >
-                      View
-                    </Button>
-                    <Button 
-                      variant="primary" 
-                      size="sm" 
-                      href={`/admin/colleges/${college._id}/add-course`}
-                    >
-                      Add Course
-                    </Button>
-                  </td>
+              {Array.isArray(colleges) && colleges.length > 0 ? (
+                colleges.map((college) => (
+                  <tr key={college._id}>
+                    <td>{college.name}</td>
+                    <td>{college.location}</td>
+                    <td>{college.courses?.length || 0}</td>
+                    <td>
+                      <Button
+                        variant="info"
+                        size="sm"
+                        href={`/colleges/${college._id}`}
+                        className="me-2"
+                      >
+                        View
+                      </Button>
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        href={`/admin/colleges/${college._id}/add-course`}
+                      >
+                        Add Course
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="text-center">No colleges found</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </Table>
         </Tab>
@@ -239,34 +246,34 @@ const AdminDashboard = () => {
           <Form onSubmit={handleAddCollege}>
             <Form.Group className="mb-3">
               <Form.Label>College Name</Form.Label>
-              <Form.Control 
-                type="text" 
+              <Form.Control
+                type="text"
                 value={newCollege.name}
-                onChange={(e) => setNewCollege({...newCollege, name: e.target.value})}
+                onChange={(e) => setNewCollege({ ...newCollege, name: e.target.value })}
                 required
               />
             </Form.Group>
-            
+
             <Form.Group className="mb-3">
               <Form.Label>Location</Form.Label>
-              <Form.Control 
-                type="text" 
+              <Form.Control
+                type="text"
                 value={newCollege.location}
-                onChange={(e) => setNewCollege({...newCollege, location: e.target.value})}
+                onChange={(e) => setNewCollege({ ...newCollege, location: e.target.value })}
                 required
               />
             </Form.Group>
-            
+
             <Form.Group className="mb-3">
               <Form.Label>Description</Form.Label>
-              <Form.Control 
-                as="textarea" 
+              <Form.Control
+                as="textarea"
                 rows={3}
                 value={newCollege.description}
-                onChange={(e) => setNewCollege({...newCollege, description: e.target.value})}
+                onChange={(e) => setNewCollege({ ...newCollege, description: e.target.value })}
               />
             </Form.Group>
-            
+
             <div className="d-flex justify-content-end">
               <Button variant="secondary" className="me-2" onClick={() => setShowAddCollegeModal(false)}>
                 Cancel

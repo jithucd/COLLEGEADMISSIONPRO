@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signup } from "../services/auth";
+import { getAllColleges } from "../services/admin"; // ✅ Import function to fetch colleges
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Container, Alert } from "react-bootstrap";
 
@@ -8,15 +9,34 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("student");
+  const [collegeId, setCollegeId] = useState(""); // ✅ Store selected college
+  const [colleges, setColleges] = useState([]); // ✅ Store list of colleges
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  // Fetch colleges when component loads
+  useEffect(() => {
+    const fetchColleges = async () => {
+      try {
+        const data = await getAllColleges();
+        setColleges(data);
+      } catch (err) {
+        console.error("Error fetching colleges:", err);
+        setError("Failed to load colleges.");
+      }
+    };
+    fetchColleges();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
     try {
-      const response = await signup({ name, email, password, role });
+      // Include collegeId only if user selects "college_admin"
+      const signupData = role === "college_admin" ? { name, email, password, role, collegeId } : { name, email, password, role };
+
+      const response = await signup(signupData);
       localStorage.setItem("token", response.token);
       navigate("/dashboard");
     } catch (err) {
@@ -52,6 +72,21 @@ const Signup = () => {
           </Form.Select>
         </Form.Group>
 
+        {/* Show college dropdown only if role is "college_admin" */}
+        {role === "college_admin" && (
+          <Form.Group controlId="collegeId" className="mt-2">
+            <Form.Label>Select College</Form.Label>
+            <Form.Select value={collegeId} onChange={(e) => setCollegeId(e.target.value)} required>
+              <option value="">Select a College</option>
+              {colleges.map((college) => (
+                <option key={college._id} value={college._id}>
+                  {college.name}
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+        )}
+
         <Button variant="success" type="submit" className="mt-3">
           Signup
         </Button>
@@ -61,4 +96,3 @@ const Signup = () => {
 };
 
 export default Signup;
-
