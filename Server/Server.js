@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const cors = require("cors");
+// import cors from 'cors';
+const cors =require("cors");
 const { errorHandler } = require("./middlewares/errorMiddleware");
 const { loginLimiter, apiLimiter } = require("./middlewares/rateLimitMiddleware");
 const connectDB = require("./config/db");
@@ -22,7 +23,12 @@ connectDB();
 const logger = require("./config/logger");
 
 // Middleware
-app.use(cors({ origin: "http://localhost:5173", credentials: true}));
+app.use(cors({
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 app.use(express.json());
 app.use("/api/admissions", admissionRoutes);
 app.use((req, res, next) => {
@@ -30,7 +36,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use("/api/", apiLimiter);
-app.use("/api/auth/login", loginLimiter);
+// app.use("/api/auth/login", loginLimiter);
 
 // Routes
 app.use("/api/auth", authRoutes);

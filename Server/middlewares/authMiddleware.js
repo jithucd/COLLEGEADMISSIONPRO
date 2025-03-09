@@ -5,8 +5,11 @@ const College = require("../models/College");
 exports.authenticate = async (req, res, next) => {
   try {
 
-    const token = req.header("Authorization")?.split(" ")[1];
-
+   const token = req.header("Authorization")?.split(" ")[1];
+    
+    // const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
+    //   expiresIn: "1h",
+  // });
     if (!token) {
       return res.status(401).json({ error: "Access denied. No token provided." });
     }
