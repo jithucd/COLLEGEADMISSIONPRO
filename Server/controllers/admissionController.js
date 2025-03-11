@@ -1,5 +1,6 @@
 import Admission from "../models/Admission.js";
 import Course from "../models/Course.js";
+import sendMail from "../utils/mailer.js";
 export const createAdmission = async (req, res) => {
   try {
     
@@ -47,16 +48,48 @@ export const getAdmissionStatus = async (req, res) => {
 };
 export const updateAdmissionStatus = async (req, res) => {
   try {
-    const admission = await Admission.findByIdAndUpdate(
-      req.params.id,
-      { status: req.body.status },
-      { new: true }
-    );
-    res.json({ success: true, admission });
+    const { admissionId } = req.params;
+    const { status } = req.body;
+
+    // Find admission and populate user and course details
+    const admission = await Admission.findById(admissionId)
+      .populate("user")
+      .populate("course")
+      .populate("college");
+
+    if (!admission) {
+      return res.status(404).json({ error: "Admission not found" });
+    }
+
+    // Update status
+    admission.status = status;
+    await admission.save();
+
+    // ✅ Send email notification to student
+    if (admission.user) {
+      const emailSubject = `Your Admission Status for ${admission.course.title}`;
+      const emailBody = `
+        Dear ${admission.user.name},
+
+        Your admission for the course "${admission.course.title}" at ${admission.college?.name || "the college"}
+        has been ${status.toUpperCase()}.
+
+        Thank you for applying. If you have any questions, please contact the college.
+
+        Best regards,  
+        ${admission.college?.name || "College Admin"}
+      `;
+
+      await sendMail(admission.user.email, emailSubject, emailBody);
+    }
+
+    res.status(200).json({ message: `Admission status updated to '${status}'` });
   } catch (err) {
-    res.status(500).json({ error: "Failed to update admission" });
+    console.error("Error updating admission status:", err);
+    res.status(500).json({ error: "Failed to update admission status" });
   }
 };
+
 export const getUserAdmissions = async (req, res) => {
   try {
     const userId = req.user._id;

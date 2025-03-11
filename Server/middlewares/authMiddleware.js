@@ -1,14 +1,15 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const College = require("../models/College");
+const mongoose = require("mongoose");
 
 exports.authenticate = async (req, res, next) => {
   try {
 
-   const token = req.header("Authorization")?.split(" ")[1];
-    
-    // const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
-    //   expiresIn: "1h",
+  //  const token = req.header("Authorization")?.split(" ")[1];
+  const token = req.headers.authorization?.split(" ")[1];
+  //   const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
+  //     expiresIn: "1h",
   // });
     if (!token) {
       return res.status(401).json({ error: "Access denied. No token provided." });
@@ -41,14 +42,21 @@ exports.isAdmin = (req, res, next) => {
 
 exports.isCollegeAdmin = async (req, res, next) => {
   try {
-    const { id: collegeId } = req.params;
-    const college = await College.findById(collegeId);
-    if (!college) return res.status(404).json({ error: "College not found." });
+    console.log("Middleware hit - isCollegeAdmin");
+    console.log("Authenticated user ID:", req.user?.id);
+    const adminId = new mongoose.Types.ObjectId(req.user.id);
+    const college = await College.findOne({ admin: adminId });
+    if (!college) {
+      console.log("No college found for this admin.");
+      return res.status(404).json({ error: "College not found." });
+    }
     if (college.admin.toString() !== req.user.id) {
       return res.status(403).json({ error: "Unauthorized action." });
     }
+    console.log("College found:", college.name);
     next();
   } catch (err) {
+    console.error("Error in isCollegeAdmin:", err);
     res.status(500).json({ error: "Server error." });
   }
 };

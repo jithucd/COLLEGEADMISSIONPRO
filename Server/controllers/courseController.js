@@ -5,7 +5,7 @@ const User = require("../models/User");
 // Add a new course (admin or college admin)
 exports.addCourse = async (req, res) => {
   try {
-    const { title, description, fees, duration, collegeId } = req.body;
+    let { title, description, fees, duration, collegeId } = req.body;
     const user = req.user; // From auth middleware
 
      // Auto-assign collegeId for college admins
@@ -47,7 +47,7 @@ exports.addCourse = async (req, res) => {
     college.courses.push(course._id);
     await college.save();
 
-    res.status(201).json({ success: true, course });
+    res.status(201).json(course);
   } catch (err) {
     console.error("Error adding course:", err);
     res.status(500).json({ error: "Failed to add course" });

@@ -13,7 +13,7 @@ const userRoutes = require("./routes/userRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const cloudinary = require("./config/cloudinary");
 const admissionRoutes = require("./routes/admissionRoutes");
-
+const collegeAdminRoutes=require("./routes/collegeAdminRoutes");
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -45,7 +45,7 @@ app.use("/api/colleges", collegeRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/payments", paymentRoutes);
-
+app.use("/api/college-admin", collegeAdminRoutes);
 // Error handling middleware
 app.use(errorHandler);
 

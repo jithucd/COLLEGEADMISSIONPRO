@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate ,useLocation} from "react-router-dom";
 import { Container, Form, Button, Alert } from "react-bootstrap";
 import { addCourse } from "../services/colleges";
 
@@ -38,7 +38,7 @@ const AddCourse = () => {
         fees: parseFloat(formData.fees)
       }, token);
       alert("Course added successfully!");
-      navigate(`/colleges/${collegeId}/courses`);
+      navigate(-1);
     } catch (err) {
       setError(err.message || "Failed to add course");
     } finally {
