@@ -15,7 +15,9 @@ const userSchema = new mongoose.Schema(
     college: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'College'
-    }
+    },
+    active: { type: Boolean, default: true }
+   
   },
   { timestamps: true } // Adds createdAt and updatedAt fields
 );

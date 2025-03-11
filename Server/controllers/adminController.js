@@ -34,13 +34,24 @@ exports.deleteUser = async (req, res) => {
 // Create a college
 exports.createCollege = async (req, res) => {
   try {
+    console.log("🔄 Received College Creation Request:", req.body);
+
     const { name, location, description } = req.body;
-    const college = await College.create({ name, location, description,admin: req.user.id  });
+    if (!name || !location) {
+      console.log("❌ Missing fields:", req.body);
+      return res.status(400).json({ error: "Name and location are required" });
+    }
+
+    const college = await College.create({ name, location, description, admin: req.user.id });
+    console.log("✅ College Created Successfully:", college);
+
     res.status(201).json({ success: true, college });
   } catch (err) {
+    console.error("❌ Failed to create college:", err);
     res.status(500).json({ error: "Failed to create college" });
   }
 };
+
 exports.updateUserRole = async (req, res) => {
   try {
       
@@ -91,5 +102,77 @@ exports.getAllColleges = async (req, res) => {
     res.json({ success: true, colleges });
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch colleges" });
+  }
+};
+// Toggle College Status
+exports.toggleCollegeStatus = async (req, res) => {
+  try {
+    console.log("🔄 Toggle College Status Request:", req.params.collegeId, "Set active:", req.body.active);
+
+    // Find the college before updating
+    let college = await College.findById(req.params.collegeId);
+    if (!college) {
+      console.log("❌ College not found");
+      return res.status(404).json({ error: "College not found" });
+    }
+
+    console.log("✅ College before update:", college);
+
+    // Update the college status
+    college.active = req.body.active;
+    await college.save();  // Saving the update
+
+    // Verify the update
+    college = await College.findById(req.params.collegeId);
+    console.log("✅ College after update:", college);
+
+    res.json({ success: true, college });
+  } catch (err) {
+    console.error("❌ Failed to toggle college status:", err);
+    res.status(500).json({ error: "Failed to toggle college status" });
+  }
+};
+
+
+// Toggle User Status
+exports.toggleUserStatus = async (req, res) => {
+  try {
+    console.log("🔄 Received toggle request for User ID:", req.params.userId, "Set active:", req.body.active);
+
+    // Find user before updating
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      console.log("❌ User not found in DB:", req.params.userId);
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    console.log("✅ Found user:", user.name, "| Current Status:", user.active);
+
+    // Update user status
+    user.active = req.body.active;
+    await user.save();
+
+    console.log("🔄 After Update - User Active Status:", user.active);
+
+    // If user is a college admin, update corresponding college status
+    if (user.role === "college_admin") {
+      console.log("🔍 Searching for college with admin ID:", user._id);
+      
+      const college = await College.findOne({ admin: user._id });
+      
+      if (!college) {
+        console.log("❌ No college found for this admin. Possible issue with the database.");
+      } else {
+        console.log("✅ College found:", college.name, "| Updating status...");
+        college.active = req.body.active;
+        await college.save();
+        console.log("✅ College status updated successfully.");
+      }
+    }
+
+    res.json({ success: true, user });
+  } catch (err) {
+    console.error("❌ Failed to toggle user status:", err);
+    res.status(500).json({ error: "Failed to toggle user status" });
   }
 };

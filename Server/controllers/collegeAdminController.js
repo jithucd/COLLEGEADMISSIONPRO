@@ -8,7 +8,7 @@ exports.getAdmissions = async (req, res) => {
     if (!college) return res.status(404).json({ error: "College not found" });
     
     // Get admissions for the college the admin is associated with
-    const admissions = await Admission.find({ college: req.user.college })
+    const admissions = await Admission.find({ college: college._id })
       .populate('user course college');
       
     res.json(admissions);

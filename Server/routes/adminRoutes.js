@@ -20,5 +20,6 @@ router.get(
 router.get('/college-admin/admissions', authenticate, isCollegeAdmin, collegeAdminController.getAdmissions);
 router.put('/college-admin/admissions/:id', authenticate, isCollegeAdmin, collegeAdminController.updateAdmissionStatus);
 router.get("/colleges", authenticate, isAdmin, adminController.getAllColleges);
-
+router.put("/users/:userId/status", authenticate, isAdmin, adminController.toggleUserStatus);
+router.put("/:collegeId/status", authenticate, isAdmin, adminController.toggleCollegeStatus);
 module.exports = router;

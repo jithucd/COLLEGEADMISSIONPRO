@@ -26,7 +26,7 @@ router.post(
     courseController.addCourse
   );
   router.get("/:id/courses", collegeController.getCourses);
-module.exports = router;
+
 
 router.get("/colleges/:id", async (req, res) => {
   try {
@@ -38,3 +38,5 @@ router.get("/colleges/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch college details" });
   }
 });
+router.put("/:collegeId/status", authenticate, isAdmin, adminController.toggleCollegeStatus);
+module.exports = router;
