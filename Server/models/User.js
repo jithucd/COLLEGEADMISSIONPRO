@@ -16,7 +16,11 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'College'
     },
-    active: { type: Boolean, default: true }
+    active: { type: Boolean, default: true },
+    profilePicture: {
+       type: String,
+       default: "/default-profile.jpg"
+       }
    
   },
   { timestamps: true } // Adds createdAt and updatedAt fields

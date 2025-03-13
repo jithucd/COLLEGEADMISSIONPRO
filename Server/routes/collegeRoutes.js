@@ -6,7 +6,9 @@ const collegeController = require("../controllers/collegeController");
 const courseController = require("../controllers/courseController");
 const adminController = require("../controllers/adminController");
 const upload = require("../config/multer");
-const { uploadCollegeImage } = require("../controllers/collegeController");
+ const { uploadCollegeImage } = require("../controllers/collegeController");
+const College = require('../models/College');
+
 // Get all colleges (public)
 router.get("/", collegeController.getAllColleges);
 
@@ -41,5 +43,6 @@ router.get("/colleges/:id", async (req, res) => {
   }
 });
 router.put("/:collegeId/status", authenticate, isAdmin, adminController.toggleCollegeStatus);
-router.post("/:id/upload", upload.single("image"), uploadCollegeImage);
+router.post('/upload-image/:collegeId', authenticate, upload.single('image'), uploadCollegeImage);
+
 module.exports = router;

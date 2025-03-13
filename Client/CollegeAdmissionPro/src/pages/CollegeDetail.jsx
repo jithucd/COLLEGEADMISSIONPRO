@@ -64,7 +64,7 @@ const CollegeDetail = () => {
       {/* ✅ Show placeholder if no image */}
       <div className="mb-4">
         <img
-          src={college?.image || "/placeholder.jpg"}
+          src={college?.imageUrl || "/placeholder.jpg"}
           alt={college?.name || "College Image"}
           style={{ width: "100%", maxWidth: "400px", borderRadius: "8px" }}
           onError={(e) => (e.target.src = "/placeholder.jpg")} // Handle broken image links

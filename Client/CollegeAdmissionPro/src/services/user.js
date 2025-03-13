@@ -54,10 +54,16 @@ export const getProfile = async () => {
 };
 
 
-export const uploadProfilePicture = async (formData, token) => {
-  const response = await axios.post(`${API_URL}/upload-profile-picture`, formData, {
+export const uploadProfilePicture = async (formData) => {
+  const token = localStorage.getItem("token"); // ✅ Get token directly from localStorage
+
+  if (!token) {
+    throw new Error("No authentication token found. Please log in again.");
+  }
+
+  const response = await axios.post(`${API_URL}/upload`, formData, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${token}`, // ✅ Send token in the header
       "Content-Type": "multipart/form-data"
     }
   });

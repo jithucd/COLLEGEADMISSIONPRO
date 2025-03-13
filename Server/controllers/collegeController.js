@@ -1,10 +1,11 @@
 const College = require("../models/College");
 const cloudinary = require("../config/cloudinary");
 const Course = require("../models/Course");
+const fs = require('fs');
 // Get all colleges
 exports.getAllColleges = async (req, res) => {
   try {
-    const colleges = await College.find();
+    const colleges = await College.find({}, 'name location description imageUrl');
     res.json(colleges);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch colleges" });
@@ -67,35 +68,33 @@ exports.getCourses = async (req, res) => {
 
 exports.uploadCollegeImage = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { collegeId } = req.params;
 
     if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded" });
+      return res.status(400).json({ message: "No file uploaded" });
     }
 
-    // Upload to Cloudinary
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: "colleges",
-    });
+    const result = await cloudinary.uploader.upload(req.file.path);
 
-    // Update the college record with the image URL
-    const college = await College.findByIdAndUpdate(
-      id,
-      { image: result.secure_url },
-      { new: true }
-    );
+    if (result) {
+      const updatedCollege = await College.findByIdAndUpdate(
+        collegeId,
+        { imageUrl: result.secure_url },
+        { new: true }
+      ).populate("courses"); 
 
-    if (!college) {
-      return res.status(404).json({ error: "College not found" });
+      if (!updatedCollege) {
+        return res.status(404).json({ message: "College not found" });
+      }
+
+      fs.unlinkSync(req.file.path);
+
+      res.status(200).json({ message: "Image uploaded successfully", updatedCollege });
+    } else {
+      res.status(500).json({ message: "Failed to upload image" });
     }
-
-    res.status(200).json({
-      message: "Image uploaded successfully",
-      data: college,
-    });
-    result.end(req.file.buffer); 
-  } catch (err) {
-    console.error("Error uploading image:", err);
-    res.status(500).json({ error: "Failed to upload image" });
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };

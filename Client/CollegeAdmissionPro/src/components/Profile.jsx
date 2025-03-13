@@ -303,7 +303,7 @@ const Profile = () => {
       <Row className="mt-4">
         <Col md={4} className="text-center">
           {profile.profilePicture ? (
-            <Image src={profile.profilePicture} style={styles.profileImage} />
+            <Image src={profile.profilePicture || "/default-profile.png"} style={styles.profileImage} />
           ) : (
             <div style={styles.profilePlaceholder}>
               <span>{profile.name?.charAt(0).toUpperCase()}</span>

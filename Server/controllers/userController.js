@@ -42,19 +42,25 @@ exports.updateProfile = async (req, res) => {
 
 exports.uploadProfilePicture = async (req, res) => {
   try {
-    if (!req.file || !req.file.path) {
-      return res.status(400).json({ error: "No file uploaded" });
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
     }
 
-    // Save Cloudinary URL to user profile
-    req.user.profilePicture = req.file.path;
-    await req.user.save();
-
-    res.json({ success: true, imageUrl: req.file.path });
+    // ✅ Save Cloudinary URL instead of req.file.path
+    if (req.file && req.file.path) {
+      user.profilePicture = req.file.path;
+      await user.save();
+      res.status(200).json({ success: true, imageUrl: user.profilePicture });
+    } else {
+      res.status(400).json({ error: "Invalid file upload" });
+    }
   } catch (error) {
-    res.status(500).json({ error: "Failed to upload image" });
+    console.error("Error uploading profile picture:", error);
+    res.status(500).json({ error: "Failed to upload profile picture" });
   }
 };
+
 
 exports.removeFromFavorites = async (req, res) => {
   try {

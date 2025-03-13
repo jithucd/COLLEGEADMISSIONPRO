@@ -39,6 +39,152 @@
 // };
 
 // export default CollegeCard;
+// import { useState } from "react";
+// import { Card, Button } from "react-bootstrap";
+// import { Link } from "react-router-dom";
+// import { FiMapPin, FiArrowRight } from "react-icons/fi";
+
+// const CollegeCard = ({ college, isLoading }) => {
+//   const [showFullDescription, setShowFullDescription] = useState(false);
+
+//   const toggleDescription = () => setShowFullDescription(!showFullDescription);
+
+//   if (isLoading) {
+//     // ✅ Shimmer Effect for Loading State
+//     return (
+//       <Card style={styles.card} className="loading-card">
+//         <div className="shimmer"></div>
+//       </Card>
+//     );
+//   }
+
+//   return (
+//     <Card style={styles.card} className="fade-in">
+//       <Card.Body style={styles.cardBody}>
+//         {/* Title */}
+//         <Card.Title style={styles.title}>{college.name}</Card.Title>
+
+//         {/* Location */}
+//         <div style={styles.location}>
+//           <FiMapPin style={styles.icon} />
+//           <small>{college.location}</small>
+//         </div>
+
+//         {/* Description */}
+//         <Card.Text
+//           style={{
+//             ...styles.description,
+//             overflow: showFullDescription ? "visible" : "hidden",
+//             display: showFullDescription ? "block" : "-webkit-box",
+//             WebkitLineClamp: showFullDescription ? "unset" : 2, // ✅ Limit to 2 lines
+//             WebkitBoxOrient: "vertical",
+//           }}
+//         >
+//           {college.description}
+//         </Card.Text>
+
+//         {/* Read More */}
+//         {college.description.length > 100 && (
+//           <Button
+//             variant="link"
+//             size="sm"
+//             style={styles.readMore}
+//             onClick={toggleDescription}
+//           >
+//             {showFullDescription ? "Read Less" : "Read More"}
+//           </Button>
+//         )}
+
+//         {/* Explore Programs Button */}
+//         <Button
+//           style={styles.button}
+//           as={Link}
+//           to={`/colleges/${college._id}`}
+//         >
+//           Explore Programs <FiArrowRight style={styles.arrow} />
+//         </Button>
+//       </Card.Body>
+//     </Card>
+//   );
+// };
+
+// const styles = {
+//   card: {
+//     backgroundColor: "#ffffff",
+//     borderRadius: "16px",
+//     padding: "20px",
+//     boxShadow: "0 8px 16px rgba(0,0,0,0.15)", // ✅ 3D shadow
+//     transition: "transform 0.3s ease, box-shadow 0.3s ease",
+//     cursor: "pointer",
+//     overflow: "hidden",
+//     minHeight: "250px", // ✅ Fixed height for equal size
+//     display: "flex",
+//     flexDirection: "column",
+//     justifyContent: "space-between",
+//     '&:hover': {
+//       transform: "translateY(-6px)", // ✅ Lift effect on hover
+//       boxShadow: "0 12px 24px rgba(0,0,0,0.25)",
+//     },
+//   },
+//   cardBody: {
+//     padding: "10px",
+//   },
+//   title: {
+//     fontSize: "1.5rem",
+//     fontWeight: "bold",
+//     color: "#2c3e50",
+//     marginBottom: "10px",
+//   },
+//   location: {
+//     display: "flex",
+//     alignItems: "center",
+//     color: "#7f8c8d",
+//     marginBottom: "12px",
+//   },
+//   icon: {
+//     marginRight: "8px",
+//     color: "#3498db",
+//   },
+//   description: {
+//     fontSize: "0.95rem",
+//     color: "#6c757d",
+//     marginBottom: "12px",
+//     lineHeight: "1.5",
+//     display: "-webkit-box",
+//     WebkitBoxOrient: "vertical",
+//     WebkitLineClamp: 2, // ✅ Limit to 2 lines
+//   },
+//   readMore: {
+//     padding: "0",
+//     margin: "0",
+//     color: "#3498db",
+//     textDecoration: "underline",
+//     cursor: "pointer",
+//     background: "none",
+//     border: "none",
+//   },
+//   button: {
+//     backgroundColor: "#3498db",
+//     color: "#ffffff",
+//     borderRadius: "30px",
+//     padding: "8px 20px",
+//     fontSize: "0.9rem",
+//     border: "none",
+//     transition: "background-color 0.3s ease",
+//     display: "flex",
+//     alignItems: "center",
+//     justifyContent: "center",
+//     '&:hover': {
+//       backgroundColor: "#2980b9",
+//     },
+//   },
+//   arrow: {
+//     marginLeft: "6px",
+//   },
+// };
+
+// export default CollegeCard;
+
 import { useState } from "react";
 import { Card, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
@@ -60,17 +206,26 @@ const CollegeCard = ({ college, isLoading }) => {
 
   return (
     <Card style={styles.card} className="fade-in">
+      {/* ✅ Display College Image */}
+      {college.imageUrl  && (
+        <Card.Img
+          src={college.imageUrl }
+          alt={college.name}
+          style={styles.image}
+        />
+      )}
+      
       <Card.Body style={styles.cardBody}>
-        {/* Title */}
+        {/* ✅ Title */}
         <Card.Title style={styles.title}>{college.name}</Card.Title>
 
-        {/* Location */}
+        {/* ✅ Location */}
         <div style={styles.location}>
           <FiMapPin style={styles.icon} />
           <small>{college.location}</small>
         </div>
 
-        {/* Description */}
+        {/* ✅ Description */}
         <Card.Text
           style={{
             ...styles.description,
@@ -83,7 +238,7 @@ const CollegeCard = ({ college, isLoading }) => {
           {college.description}
         </Card.Text>
 
-        {/* Read More */}
+        {/* ✅ Read More */}
         {college.description.length > 100 && (
           <Button
             variant="link"
@@ -95,7 +250,7 @@ const CollegeCard = ({ college, isLoading }) => {
           </Button>
         )}
 
-        {/* Explore Programs Button */}
+        {/* ✅ Explore Programs Button */}
         <Button
           style={styles.button}
           as={Link}
@@ -117,17 +272,22 @@ const styles = {
     transition: "transform 0.3s ease, box-shadow 0.3s ease",
     cursor: "pointer",
     overflow: "hidden",
-    minHeight: "250px", // ✅ Fixed height for equal size
+    minHeight: "320px", // ✅ Increased height for consistent layout
+    maxWidth: "340px", // ✅ Ensure consistent width
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
-    '&:hover': {
-      transform: "translateY(-6px)", // ✅ Lift effect on hover
-      boxShadow: "0 12px 24px rgba(0,0,0,0.25)",
-    },
+    margin: "10px", // ✅ Ensure consistent margin
+  },
+  image: {
+    width: "100%",
+    height: "180px", // ✅ Fixed height for consistent display
+    objectFit: "cover",
+    borderTopLeftRadius: "16px",
+    borderTopRightRadius: "16px",
   },
   cardBody: {
-    padding: "10px",
+    padding: "16px",
   },
   title: {
     fontSize: "1.5rem",
@@ -152,7 +312,7 @@ const styles = {
     lineHeight: "1.5",
     display: "-webkit-box",
     WebkitBoxOrient: "vertical",
-    WebkitLineClamp: 2, // ✅ Limit to 2 lines
+    WebkitLineClamp: 2,
   },
   readMore: {
     padding: "0",
@@ -174,13 +334,49 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    '&:hover': {
-      backgroundColor: "#2980b9",
-    },
   },
   arrow: {
     marginLeft: "6px",
   },
 };
 
+// ✅ Shimmer Effect Styling (Add to your global CSS or component styles)
+const shimmerStyles = `
+.loading-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer {
+  height: 180px;
+  width: 100%;
+  background: linear-gradient(
+    to right,
+    #f0f0f0 0%,
+    #e0e0e0 20%,
+    #f0f0f0 40%,
+    #f0f0f0 100%
+  );
+  background-size: 800px 100%;
+  animation: shimmerAnimation 1.5s infinite linear;
+}
+
+@keyframes shimmerAnimation {
+  from {
+    background-position: -800px 0;
+  }
+  to {
+    background-position: 800px 0;
+  }
+}
+`;
+
+if (typeof document !== "undefined") {
+  const styleSheet = document.createElement("style");
+  styleSheet.type = "text/css";
+  styleSheet.innerText = shimmerStyles;
+  document.head.appendChild(styleSheet);
+}
+
 export default CollegeCard;
+

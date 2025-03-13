@@ -1,172 +1,6 @@
-// import { useEffect, useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import { Container, Table, Button, Card, Badge } from 'react-bootstrap';
-// import { getCollegeAdminData, getCollegeAdmissions, updateAdmissionStatus } from '../services/collegeAdmin';
 
-// const CollegeAdminDashboard = () => {
-//   const navigate = useNavigate();
-
-//   const [college, setCollege] = useState(null);
-//   const [admissions, setAdmissions] = useState([]);
-//   const [image, setImage] = useState(null);
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-//         const collegeData = await getCollegeAdminData();
-//         const admissionsData = await getCollegeAdmissions();
-
-//         setCollege(collegeData);
-//         setAdmissions(Array.isArray(admissionsData) ? admissionsData : []);
-//       } catch (err) {
-//         console.error("Error fetching data:", err);
-//         setCollege(null);
-//         setAdmissions([]);
-//       }
-//     };
-//     fetchData();
-//   }, []);
-
-//   const handleAdmissionDecision = async (admissionId, status) => {
-//     console.log("Updating admission status...", { admissionId, status });
-//     try {
-//       await updateAdmissionStatus(admissionId, status);
-//       setAdmissions((prevAdmissions) =>
-//         prevAdmissions.map((admission) =>
-//           admission._id === admissionId ? { ...admission, status } : admission
-//         )
-//       );
-//     } catch (err) {
-//       console.error("Error updating admission:", err);
-//     }
-//   };
-//   const handleImageUpload = async (e) => {
-//     e.preventDefault();
-//     if (!image) return;
-
-//     const formData = new FormData();
-//     formData.append("image", image);
-
-//     try {
-//       const response = await fetch(`/api/colleges/${college._id}/upload`, {
-//         method: "POST",
-//         body: formData,
-//       });
-//       const data = await response.json();
-//       console.log("Image upload success:", data);
-//     } catch (err) {
-//       console.error("Failed to upload image:", err);
-//     }
-//   };
-//   const getStatusBadge = (status) => {
-//     switch (status) {
-//       case 'approved':
-//         return <Badge bg="success">Approved</Badge>;
-//       case 'rejected':
-//         return <Badge bg="danger">Rejected</Badge>;
-//       default:
-//         return <Badge bg="warning">Pending</Badge>;
-//     }
-//   };
-//   return (
-//     <Container className="my-4">
-//       {college ? (
-//         <>
-//           <h2>{college.name} Dashboard</h2>
-//           <form onSubmit={handleImageUpload}>
-//             <input
-//               type="file"
-//               onChange={(e) => setImage(e.target.files[0])}
-//               accept="image/*"
-//             />
-//             <button type="submit">Upload Image</button>
-//           </form>
-//           {college.image && (
-//             <img src={college.image} alt={college.name} width="200px" />
-//           )}
-//           <Card className="mb-4">
-//             <Card.Body>
-//               <Card.Title>Course Management</Card.Title>
-//               <Button
-//                 variant="primary"
-//                 href={`/college/${college._id}/add-course`}
-
-//               >
-//                 Add New Course
-//               </Button>
-//               <div className="mt-3">
-//                 <h5>Existing Courses:</h5>
-//                 {college.courses && college.courses.length > 0 ? (
-//                   <ul>
-//                     {college.courses.map(course => (
-//                       <li key={course._id}>
-//                         <strong>{course.title}</strong>: {course.description}
-//                       </li>
-//                     ))}
-//                   </ul>
-//                 ) : (
-//                   <p>No courses found.</p>
-//                 )}
-//               </div>
-//             </Card.Body>
-//           </Card>
-
-//           <Card>
-//             <Card.Body>
-//               <Card.Title>Pending Admissions</Card.Title>
-//               <Table striped>
-//                 <thead>
-//                   <tr>
-//                     <th>Student Name</th>
-//                     <th>Course</th>
-//                     <th>Status</th>
-//                     <th>Actions</th>
-//                   </tr>
-//                 </thead>
-//                 <tbody>
-//                   {admissions.length > 0 ? (
-//                     admissions.map((admission) => (
-//                       <tr key={admission._id}>
-//                         <td>{admission.user?.name || "Unknown"}</td>
-//                         <td>{admission.course?.title || "Unknown"}</td>
-//                         <td>{getStatusBadge(admission.status)}</td>
-//                         <td>
-//                           <Button
-//                             variant="success"
-//                             size="sm"
-//                             onClick={() => handleAdmissionDecision(admission._id, 'approved')}
-//                           >
-//                             Approve
-//                           </Button>
-//                           <Button
-//                             variant="danger"
-//                             size="sm"
-//                             className="ms-2"
-//                             onClick={() => handleAdmissionDecision(admission._id, 'rejected')}
-//                           >
-//                             Reject
-//                           </Button>
-//                         </td>
-//                       </tr>
-//                     ))
-//                   ) : (
-//                     <tr>
-//                       <td colSpan="3">No admissions found.</td>
-//                     </tr>
-//                   )}
-//                 </tbody>
-//               </Table>
-//             </Card.Body>
-//           </Card>
-//         </>
-//       ) : (
-//         <div>Loading college data...</div>
-//       )}
-//     </Container>
-//   );
-// };
-
-// export default CollegeAdminDashboard;
 import { useEffect, useState } from "react";
+import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import {
   Container,
@@ -204,7 +38,8 @@ const CollegeAdminDashboard = () => {
   // Selected items for editing, deletion, or viewing
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedAdmission, setSelectedAdmission] = useState(null);
-
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [collegeImage, setCollegeImage] = useState(null);
   // Fetch data on component mount
   useEffect(() => {
     const fetchData = async () => {
@@ -297,10 +132,48 @@ const CollegeAdminDashboard = () => {
 // Handle file input change
 const handleFileChange = (e) => {
   if (e.target.files[0]) {
-    setImage(e.target.files[0]);
-    handleImageUpload(e); // Automatically upload the image when a file is selected
+    setSelectedFile(e.target.files[0]);
+    // setImage(e.target.files[0]);
+    // handleImageUpload(e); 
   }
 };
+const handleUpload = async () => {
+  if (!selectedFile || !college?._id) {
+    alert('Please select a file first');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('image', selectedFile);
+
+  try {
+    const token = localStorage.getItem('token');
+    
+    const response = await fetch(
+      `http://localhost:5000/api/colleges/upload-image/${college._id}`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Failed to upload image: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    setCollege((prev) => ({ ...prev, imageUrl: data.imageUrl })); // Update state with new URL
+    alert('Image uploaded successfully!');
+  } catch (error) {
+    console.error('Upload failed:', error);
+    alert('Failed to upload image');
+  }
+};
+
   // Get status badge for admissions
   const getStatusBadge = (status) => {
     switch (status) {
@@ -339,39 +212,19 @@ const handleFileChange = (e) => {
         minHeight: "100vh",
       }}
     >
-       <div style={{ position: "relative", display:"flex" }}>
-            {college.image && (
-              <Image
-              src={"/carousel1.jpg"}
-                alt={college.name}
-                width="200px"
-                className="mb-3"
-                style={{ borderRadius: "10px" }}
-              />
-            )}
-            <Button
-              variant="light"
-              size="sm"
-              style={{
-                position: "absolute",
-                top: "0px",
-                right: "10px",
-                borderRadius: "50%",
-                paddingTop:"10px"
-           
-              }}
-              onClick={() => document.getElementById("imageUpload").click()}
-            >
-              <FaEdit /> {/* Edit icon */}
-            </Button>
-            <input
-              id="imageUpload"
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              onChange={handleFileChange}
-            />
-          </div>
+      <div>
+      <h2>Upload College Image</h2>
+      <input type="file" onChange={handleFileChange} />
+      <button onClick={handleUpload}>Upload</button>
+      {college?.imageUrl && (
+  <img
+    src={college.imageUrl}
+    alt="College"
+    width="200"
+    style={{ objectFit: 'cover', borderRadius: '8px' }}
+  />
+)}
+    </div>
       {college ? (
         <>
           <Row className="mb-4">
