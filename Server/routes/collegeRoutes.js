@@ -5,6 +5,8 @@ const { isAdmin } = require("../middlewares/authMiddleware");
 const collegeController = require("../controllers/collegeController");
 const courseController = require("../controllers/courseController");
 const adminController = require("../controllers/adminController");
+const upload = require("../config/multer");
+const { uploadCollegeImage } = require("../controllers/collegeController");
 // Get all colleges (public)
 router.get("/", collegeController.getAllColleges);
 
@@ -39,4 +41,5 @@ router.get("/colleges/:id", async (req, res) => {
   }
 });
 router.put("/:collegeId/status", authenticate, isAdmin, adminController.toggleCollegeStatus);
+router.post("/:id/upload", upload.single("image"), uploadCollegeImage);
 module.exports = router;

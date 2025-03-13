@@ -1,4 +1,5 @@
 const College = require("../models/College");
+const cloudinary = require("../config/cloudinary");
 const Course = require("../models/Course");
 // Get all colleges
 exports.getAllColleges = async (req, res) => {
@@ -61,5 +62,40 @@ exports.getCourses = async (req, res) => {
   } catch (err) {
     console.error("Error fetching courses:", err);
     res.status(500).json({ error: "Failed to fetch courses" });
+  }
+};
+
+exports.uploadCollegeImage = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "colleges",
+    });
+
+    // Update the college record with the image URL
+    const college = await College.findByIdAndUpdate(
+      id,
+      { image: result.secure_url },
+      { new: true }
+    );
+
+    if (!college) {
+      return res.status(404).json({ error: "College not found" });
+    }
+
+    res.status(200).json({
+      message: "Image uploaded successfully",
+      data: college,
+    });
+    result.end(req.file.buffer); 
+  } catch (err) {
+    console.error("Error uploading image:", err);
+    res.status(500).json({ error: "Failed to upload image" });
   }
 };

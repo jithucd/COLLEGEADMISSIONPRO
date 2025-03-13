@@ -10,4 +10,15 @@ const Loader = () => {
   );
 };
 
+ 
+
+// Enhanced loader component
+// const Loader = () => (
+//   <div className="d-flex flex-column justify-content-center align-items-center min-vh-100 bg-light">
+//     <div className="spinner-border text-primary" style={{width: '3rem', height: '3rem'}}>
+//       <span className="visually-hidden">Loading...</span>
+//     </div>
+//     <p className="mt-3 text-muted">Loading your content...</p>
+//   </div>
+// );
 export default Loader;

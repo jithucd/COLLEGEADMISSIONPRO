@@ -1,3 +1,234 @@
+// import { useEffect, useState } from "react";
+// import { Container, Row, Col, Card, Table, Alert, Button, Spinner } from "react-bootstrap";
+// import { getProfile, removeFromFavorites } from "../services/user";
+// import { useNavigate } from "react-router-dom";
+// import { toast } from "react-toastify";
+// import axios from "axios";
+// import "react-toastify/dist/ReactToastify.css";
+
+// const Dashboard = () => {
+//   const [userData, setUserData] = useState(null);
+//   const [admissions, setAdmissions] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+//   const [isClient, setIsClient] = useState(false);
+//   const navigate = useNavigate();
+
+//   const handleApplyNow = (courseId) => {
+//     if (!courseId) {
+//       toast.error("Invalid course ID. Please try again.");
+//       return;
+//     }
+//     navigate(`/admission/${courseId}`);
+//   };
+
+//   const handleRemoveFavorite = async (courseId) => {
+//     try {
+//       await removeFromFavorites(courseId);
+//       setUserData(prev => ({
+//         ...prev,
+//         favorites: prev.favorites.filter(course => course._id !== courseId)
+//       }));
+//       toast.success("Removed from favorites");
+//     } catch (err) {
+//       toast.error("Failed to remove from favorites");
+//     }
+//   };
+
+//   useEffect(() => {
+//     setIsClient(true);
+
+//     const fetchData = async () => {
+//       try {
+//         const token = localStorage.getItem("token");
+//         if (!token) {
+//           setError("You need to be logged in to view this page");
+//           setLoading(false);
+//           return;
+//         }
+
+//         // Fetch user profile
+//         const userData = await getProfile();
+//         setUserData(userData);
+
+//         // Redirect non-students
+//         if (userData.role == "admin") {
+//           navigate("/admin-dashboard");
+//           return;
+//         }
+//         if (userData.role == "college_admin") {
+//           navigate("/college-admin-dashboard");
+//           return;
+//         }
+//         // Fetch admissions data
+//         const admissionsResponse = await axios.get("http://localhost:5000/api/admissions", {
+//           headers: { Authorization: `Bearer ${token}` },
+//         });
+//         setAdmissions(admissionsResponse.data);
+
+//         setLoading(false);
+//       } catch (err) {
+//         console.error("Error fetching dashboard data:", err); // Log full error
+
+//         // ✅ Properly check if response exists
+//         if (err.response) {
+//           setError(err.response.data?.error || "Failed to load dashboard data");
+//         } else {
+//           setError("Network error. Please try again.");
+//         }
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchData();
+//   }, [navigate]);
+
+//   if (!isClient) return null;
+
+//   if (loading) {
+//     return (
+//       <Container className="py-5 text-center">
+//         <Spinner animation="border" role="status">
+//           <span className="visually-hidden">Loading...</span>
+//         </Spinner>
+//       </Container>
+//     );
+//   }
+
+//   if (error) {
+//     return (
+//       <Container className="py-5">
+//         <Alert variant="danger">{error}</Alert>
+//       </Container>
+//     );
+//   }
+
+//   if (userData?.role !== "student") {
+//     return (
+//       <Container className="py-5">
+//         <Alert variant="warning">Access Denied: You are not a student.</Alert>
+//       </Container>
+//     );
+//   }
+
+//   return (
+//     <Container className="py-4">
+//       <h1>Welcome, {userData?.name}!</h1>
+//       <p className="lead">Student Dashboard</p>
+
+//       <Row className="mt-4">
+//         <Col md={4} className="mb-4">
+//           <Card>
+//             <Card.Body>
+//               <Card.Title>Your Profile</Card.Title>
+//               <Card.Text>
+//                 <strong>Name:</strong> {userData?.name}
+//                 <br />
+//                 <strong>Email:</strong> {userData?.email}
+//                 <br />
+//                 <strong>Role:</strong> {userData?.role || "Student"}
+//               </Card.Text>
+//             </Card.Body>
+//           </Card>
+//         </Col>
+
+//         <Col md={8}>
+//           <Card className="mb-4">
+//             <Card.Body>
+//               <Card.Title>Your Favorite Courses</Card.Title>
+//               {userData?.favorites?.length > 0 ? (
+//                 <Table responsive hover>
+//                   <thead>
+//                     <tr>
+//                       <th>Course</th>
+//                       <th>College</th>
+//                       <th>Duration</th>
+//                       <th>Fees</th>
+//                       <th>Actions</th>
+//                     </tr>
+//                   </thead>
+//                   <tbody>
+//                     {userData.favorites.map((course) =>
+//                       course && course._id ? (
+//                         <tr key={course._id}>
+//                           <td>{course.title}</td>
+//                           <td>{course.college?.name || "N/A"}</td>
+//                           <td>{course.duration}</td>
+//                           <td>₹{course.fees?.toLocaleString() || "N/A"}</td>
+//                           <td>
+//                             <Button
+//                               variant="danger"
+//                               size="sm"
+//                               onClick={() => handleRemoveFavorite(course._id)}
+//                               className="me-2"
+//                             >
+//                               Remove
+//                             </Button>
+//                             <Button
+//                               variant="success"
+//                               size="sm"
+//                               onClick={() => handleApplyNow(course._id)}
+//                               disabled={!course._id}
+//                             >
+//                               Apply Now
+//                             </Button>
+//                           </td>
+//                         </tr>
+//                       ) : null
+//                     )}
+//                   </tbody>
+//                 </Table>
+//               ) : (
+//                 <p>No favorite courses found.</p>
+//               )}
+//             </Card.Body>
+//           </Card>
+
+//           <Card>
+//             <Card.Body>
+//               <Card.Title>Admission Status</Card.Title>
+//               {admissions.length > 0 ? (
+//                 <Table striped bordered hover>
+//                   <thead>
+//                     <tr>
+//                       <th>Course</th>
+//                       <th>College</th>
+//                       <th>Status</th>
+//                     </tr>
+//                   </thead>
+//                   <tbody>
+//                     {admissions.map((admission) => (
+//                       <tr key={admission._id}>
+//                         <td>{admission.course?.title || "N/A"}</td>
+//                         <td>{admission.college?.name || "N/A"}</td>
+//                         <td>
+//                           <Alert
+//                             variant={admission.status === "approved" ? "success" :
+//                               admission.status === "rejected" ? "danger" : "info"}
+//                             className="mb-0"
+//                           >
+//                             {admission.status}
+//                           </Alert>
+//                         </td>
+//                       </tr>
+//                     ))}
+//                   </tbody>
+//                 </Table>
+//               ) : (
+//                 <p>No admission applications found.</p>
+//               )}
+//             </Card.Body>
+//           </Card>
+
+//         </Col>
+//       </Row>
+//     </Container>
+//   );
+// };
+
+// export default Dashboard;
+
 import { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Table, Alert, Button, Spinner } from "react-bootstrap";
 import { getProfile, removeFromFavorites } from "../services/user";
@@ -11,7 +242,6 @@ const Dashboard = () => {
   const [admissions, setAdmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isClient, setIsClient] = useState(false);
   const navigate = useNavigate();
 
   const handleApplyNow = (courseId) => {
@@ -25,9 +255,9 @@ const Dashboard = () => {
   const handleRemoveFavorite = async (courseId) => {
     try {
       await removeFromFavorites(courseId);
-      setUserData(prev => ({
+      setUserData((prev) => ({
         ...prev,
-        favorites: prev.favorites.filter(course => course._id !== courseId)
+        favorites: prev.favorites.filter((course) => course._id !== courseId),
       }));
       toast.success("Removed from favorites");
     } catch (err) {
@@ -36,8 +266,6 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    setIsClient(true);
-
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -52,14 +280,9 @@ const Dashboard = () => {
         setUserData(userData);
 
         // Redirect non-students
-        if (userData.role == "admin") {
-          navigate("/admin-dashboard");
-          return;
-        }
-        if (userData.role == "college_admin") {
-          navigate("/college-admin-dashboard");
-          return;
-        }
+        if (userData.role === "admin") return navigate("/admin-dashboard");
+        if (userData.role === "college_admin") return navigate("/college-admin-dashboard");
+
         // Fetch admissions data
         const admissionsResponse = await axios.get("http://localhost:5000/api/admissions", {
           headers: { Authorization: `Bearer ${token}` },
@@ -68,14 +291,8 @@ const Dashboard = () => {
 
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching dashboard data:", err); // Log full error
-
-        // ✅ Properly check if response exists
-        if (err.response) {
-          setError(err.response.data?.error || "Failed to load dashboard data");
-        } else {
-          setError("Network error. Please try again.");
-        }
+        console.error("Error fetching dashboard data:", err);
+        setError(err.response?.data?.error || "Failed to load dashboard data");
       } finally {
         setLoading(false);
       }
@@ -84,12 +301,10 @@ const Dashboard = () => {
     fetchData();
   }, [navigate]);
 
-  if (!isClient) return null;
-
   if (loading) {
     return (
-      <Container className="py-5 text-center">
-        <Spinner animation="border" role="status">
+      <Container style={styles.centered}>
+        <Spinner animation="border" role="status" style={styles.spinner}>
           <span className="visually-hidden">Loading...</span>
         </Spinner>
       </Container>
@@ -98,31 +313,34 @@ const Dashboard = () => {
 
   if (error) {
     return (
-      <Container className="py-5">
+      <Container style={styles.centered}>
         <Alert variant="danger">{error}</Alert>
       </Container>
     );
   }
 
-  if (userData?.role !== "student") {
-    return (
-      <Container className="py-5">
-        <Alert variant="warning">Access Denied: You are not a student.</Alert>
-      </Container>
-    );
-  }
-
   return (
-    <Container className="py-4">
-      <h1>Welcome, {userData?.name}!</h1>
-      <p className="lead">Student Dashboard</p>
+    <Container fluid
+    className="p-4"
+    style={{
+      backgroundColor: "#f8f9fa",
+      backgroundImage: "url('/bg4.jpg')",
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      minHeight: "100vh",
+      
+    }}>
+      <h1 style={styles.header}>Welcome, {userData?.name}!</h1>
+      <p style={styles.subHeader}>Student Dashboard</p>
 
       <Row className="mt-4">
+        {/* Profile Card
         <Col md={4} className="mb-4">
-          <Card>
+          <Card style={styles.card}>
             <Card.Body>
-              <Card.Title>Your Profile</Card.Title>
-              <Card.Text>
+              <Card.Title style={styles.cardTitle}>Your Profile</Card.Title>
+              <Card.Text style={styles.cardText}>
                 <strong>Name:</strong> {userData?.name}
                 <br />
                 <strong>Email:</strong> {userData?.email}
@@ -131,14 +349,15 @@ const Dashboard = () => {
               </Card.Text>
             </Card.Body>
           </Card>
-        </Col>
+        </Col> */}
 
-        <Col md={8}>
-          <Card className="mb-4">
+        {/* Favorite Courses */}
+        <Col md={12}>
+          <Card style={styles.card}>
             <Card.Body>
-              <Card.Title>Your Favorite Courses</Card.Title>
+              <Card.Title style={styles.cardTitle}>Your Favorite Courses</Card.Title>
               {userData?.favorites?.length > 0 ? (
-                <Table responsive hover>
+                <Table responsive hover style={styles.table}>
                   <thead>
                     <tr>
                       <th>Course</th>
@@ -149,34 +368,30 @@ const Dashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {userData.favorites.map((course) =>
-                      course && course._id ? (
-                        <tr key={course._id}>
-                          <td>{course.title}</td>
-                          <td>{course.college?.name || "N/A"}</td>
-                          <td>{course.duration}</td>
-                          <td>₹{course.fees?.toLocaleString() || "N/A"}</td>
-                          <td>
-                            <Button
-                              variant="danger"
-                              size="sm"
-                              onClick={() => handleRemoveFavorite(course._id)}
-                              className="me-2"
-                            >
-                              Remove
-                            </Button>
-                            <Button
-                              variant="success"
-                              size="sm"
-                              onClick={() => handleApplyNow(course._id)}
-                              disabled={!course._id}
-                            >
-                              Apply Now
-                            </Button>
-                          </td>
-                        </tr>
-                      ) : null
-                    )}
+                    {userData.favorites.map((course) => (
+                      <tr key={course._id}>
+                        <td>{course.title}</td>
+                        <td>{course.college?.name || "N/A"}</td>
+                        <td>{course.duration}</td>
+                        <td>₹{course.fees?.toLocaleString() || "N/A"}</td>
+                        <td>
+                          <Button
+                            style={styles.removeButton}
+                            size="sm"
+                            onClick={() => handleRemoveFavorite(course._id)}
+                          >
+                            Remove
+                          </Button>
+                          <Button
+                            style={styles.applyButton}
+                            size="sm"
+                            onClick={() => handleApplyNow(course._id)}
+                          >
+                            Apply Now
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
               ) : (
@@ -185,11 +400,12 @@ const Dashboard = () => {
             </Card.Body>
           </Card>
 
-          <Card>
+          {/* Admission Status */}
+          <Card style={styles.card}>
             <Card.Body>
-              <Card.Title>Admission Status</Card.Title>
+              <Card.Title style={styles.cardTitle}>Admission Status</Card.Title>
               {admissions.length > 0 ? (
-                <Table striped bordered hover>
+                <Table responsive striped hover style={styles.table}>
                   <thead>
                     <tr>
                       <th>Course</th>
@@ -204,9 +420,13 @@ const Dashboard = () => {
                         <td>{admission.college?.name || "N/A"}</td>
                         <td>
                           <Alert
-                            variant={admission.status === "approved" ? "success" :
-                              admission.status === "rejected" ? "danger" : "info"}
-                            className="mb-0"
+                            variant={
+                              admission.status === "approved"
+                                ? "success"
+                                : admission.status === "rejected"
+                                  ? "danger"
+                                  : "info"
+                            }
                           >
                             {admission.status}
                           </Alert>
@@ -216,15 +436,64 @@ const Dashboard = () => {
                   </tbody>
                 </Table>
               ) : (
-                <p>No admission applications found.</p>
+                <p>No admissions found.</p>
               )}
             </Card.Body>
           </Card>
-
         </Col>
       </Row>
     </Container>
   );
+};
+
+const styles = {
+  container: {
+    padding: "30px",
+    backgroundColor: "#f9fafc"
+ 
+  },
+  header: {
+    fontSize: "2.5rem",
+    fontWeight: "600",
+    color: "white",
+  },
+  subHeader: {
+    fontSize: "1.2rem",
+    color: "white",
+  },
+  card: {
+    borderRadius: "12px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+    border: "none",
+    marginBottom: "20px",
+  },
+  cardTitle: {
+    fontSize: "1.3rem",
+    fontWeight: "500",
+  },
+  table: {
+    fontSize: "0.95rem",
+  },
+  removeButton: {
+    backgroundColor: "#e74c3c",
+    color: "#fff",
+    marginRight: "5px",
+    border: "none",
+    borderRadius: "6px",
+  },
+  applyButton: {
+    backgroundColor: "#27ae60",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+  },
+  spinner: {
+    color: "#007bff",
+  },
+  centered: {
+    textAlign: "center",
+    paddingTop: "50px",
+  },
 };
 
 export default Dashboard;

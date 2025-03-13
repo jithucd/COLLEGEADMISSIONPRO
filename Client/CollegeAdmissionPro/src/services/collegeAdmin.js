@@ -81,3 +81,39 @@ export const getCollegeAdminData = async () => {
     throw new Error(error.message || "Failed to fetch college admin data");
   }
 };
+// Delete a course
+export const deleteCourse = async (courseId) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`/api/college-admin/courses/${courseId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete course");
+  }
+
+  return response.json();
+};
+
+// Update a course
+export const updateCourse = async (courseId, updatedCourse) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`/api/college-admin/courses/${courseId}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(updatedCourse),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update course");
+  }
+
+  return response.json();
+};

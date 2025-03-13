@@ -4,6 +4,7 @@ const College = require("../models/College");
 const mongoose = require("mongoose");
 const User = require("../models/User");
 const sendMail = require("../utils/mailer");
+const Course = require("../models/Course");
 exports.getAdmissions = async (req, res) => {
   try {
 
@@ -92,3 +93,35 @@ exports.updateAdmissionStatus = async (req, res) => {
       res.status(500).json({ error: "Failed to fetch college data" });
     }
   };
+
+  // Delete a course
+exports.deleteCourse = async (req, res) => {
+  try {
+    const course = await Course.findByIdAndDelete(req.params.courseId);
+    if (!course) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to delete course" });
+  }
+};
+
+// Update a course
+exports.updateCourse = async (req, res) => {
+  try {
+    const updatedCourse = await Course.findByIdAndUpdate(
+      req.params.courseId,
+      req.body,
+      { new: true }
+    );
+    if (!updatedCourse) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+    res.json(updatedCourse);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update course" });
+  }
+};
