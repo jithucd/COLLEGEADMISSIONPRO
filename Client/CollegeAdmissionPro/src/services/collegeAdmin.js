@@ -84,7 +84,7 @@ export const getCollegeAdminData = async () => {
 // Delete a course
 export const deleteCourse = async (courseId) => {
   const token = localStorage.getItem("token");
-  const response = await fetch(`/api/college-admin/courses/${courseId}`, {
+  const response = await fetch(`${API_URL}/college-admin/courses/${courseId}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -102,7 +102,7 @@ export const deleteCourse = async (courseId) => {
 // Update a course
 export const updateCourse = async (courseId, updatedCourse) => {
   const token = localStorage.getItem("token");
-  const response = await fetch(`/api/college-admin/courses/${courseId}`, {
+  const response = await fetch(`${API_URL}/college-admin/courses/${courseId}`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,

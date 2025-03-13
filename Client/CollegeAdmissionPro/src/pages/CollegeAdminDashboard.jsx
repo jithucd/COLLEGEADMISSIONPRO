@@ -242,7 +242,8 @@ const CollegeAdminDashboard = () => {
   // Handle course deletion
   const handleDeleteCourse = async () => {
     try {
-      await deleteCourse(selectedCourse._id);
+      const token = localStorage.getItem("token");
+      await deleteCourse(selectedCourse._id,token);
       setCollege((prevCollege) => ({
         ...prevCollege,
         courses: prevCollege.courses.filter(
