@@ -87,7 +87,7 @@ const Signup = () => {
             college: null,
           };
     
-    const response = await fetch("http://localhost:5000/api/auth/signup", {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -115,7 +115,15 @@ const Signup = () => {
   };
 
   return (
-    <Container fluid style={{ padding: "2rem", minHeight: "100vh" }}>
+    <Container fluid  style={{
+      backgroundColor: "whitesmoke",
+      backgroundImage: "url('/images/signup5.jpg')",
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      minHeight: "100vh",
+      padding: "2rem 0",
+    }}>
       <Row className="justify-content-center">
         <Col md={8} lg={6}>
           {error && (

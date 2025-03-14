@@ -49,6 +49,7 @@ const StyledNavbar = styled(Navbar)`
     &:hover::after {
       width: 100%;
     }
+   
   }
 `;
 

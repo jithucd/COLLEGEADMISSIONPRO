@@ -61,7 +61,7 @@ const styles = {
   container: {
     padding: "30px",
     backgroundColor: "#f9fafc",
-    backgroundImage: "url('/signupbg.jpg')",
+    backgroundImage: "url('/images/signupbg.jpg')",
     backgroundRepeat: "no-repeat",
     backgroundSize: "cover",
     backgroundPosition: "center",

@@ -284,7 +284,8 @@ const Dashboard = () => {
         if (userData.role === "college_admin") return navigate("/college-admin-dashboard");
 
         // Fetch admissions data
-        const admissionsResponse = await axios.get("http://localhost:5000/api/admissions", {
+        
+        const admissionsResponse = await axios.get(`${import.meta.env.VITE_API_URL}/api/admissions`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAdmissions(admissionsResponse.data);
@@ -324,7 +325,7 @@ const Dashboard = () => {
     className="p-4"
     style={{
       backgroundColor: "#f8f9fa",
-      backgroundImage: "url('/bg4.jpg')",
+      backgroundImage: "url('/images/bg4.jpg')",
       backgroundRepeat: "no-repeat",
       backgroundSize: "cover",
       backgroundPosition: "center",

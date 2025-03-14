@@ -245,9 +245,9 @@ const cardStyle = {
 
 // Carousel Images
 const carouselImages = [
-  "https://www.manipal.edu/content/dam/manipal/mu/sois-campus.jpg",
-  "https://www.manipal.edu/content/dam/manipal/mu/About-Us/infrastructure/Infrastructure%20Banner.jpg",
-  "https://www.manipal.edu/content/dam/manipal/mu/soa-campus.jpg"
+  "/images/carousel0.jpg",
+  "/images/carousel1.jpg",
+  "/images/carousel2.jpg"
 ];
 
 const Home = () => {
@@ -287,7 +287,7 @@ const Home = () => {
             <Carousel.Item key={idx}>
               <img
                 className="d-block w-100"
-                src={`/carousel${idx}.jpg`}
+                src={carouselImages[idx]} 
                 alt={`Slide ${idx + 1}`}
                 style={{ 
                   height: '60vh', 

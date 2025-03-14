@@ -116,7 +116,8 @@ const CollegeAdminDashboard = () => {
       const token = localStorage.getItem('token');
       
       const response = await fetch(
-        `http://localhost:5000/api/colleges/upload-image/${college._id}`,
+        
+        `${import.meta.env.VITE_API_URL}/api/colleges/upload-image/${college._id}`,
         {
           method: 'POST',
           headers: {
@@ -170,7 +171,7 @@ const CollegeAdminDashboard = () => {
       className="p-4"
       style={{
         backgroundColor: "#f8f9fa",
-        backgroundImage: "url('/bg4.jpg')",
+        backgroundImage: "url('/images/bg4.jpg')",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
         backgroundPosition: "center",

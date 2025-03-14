@@ -1,6 +1,6 @@
 // Client/CollegeAdmissionPro/src/services/admission.js
 import axios from "axios";
-
+const API_URL = `${import.meta.env.VITE_API_URL}`;
 export const createAdmission = async (courseId, formData) => {
   const token = localStorage.getItem("token");
 
@@ -9,7 +9,8 @@ export const createAdmission = async (courseId, formData) => {
 
   try {
     const response = await axios.post(
-      "http://localhost:5000/api/admissions",
+      `${API_URL}/api/admissions`,
+     
       { courseId, ...formData }, // Data payload
       {
         headers: {
@@ -31,7 +32,8 @@ export const createAdmission = async (courseId, formData) => {
     const token = localStorage.getItem("token");
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/payments/create-order",
+        `${API_URL}/api/payments/create-order`,
+        
         { admissionId, amount },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -43,7 +45,7 @@ export const createAdmission = async (courseId, formData) => {
 
   export const getAdmissionStatus = async (admissionId) => {
     try {
-      const response = await axios.get(`http://localhost:5000/${admissionId}/status`);
+      const response = await axios.get(`${API_URL}/${admissionId}/status`);
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.error || "Failed to fetch admission status");

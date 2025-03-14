@@ -134,7 +134,7 @@ const Login = () => {
       fluid
       style={{
         backgroundColor: "whitesmoke",
-        backgroundImage: "url('/signup5.jfif')",
+        backgroundImage: "url('/images/signup5.jpg')",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
         backgroundPosition: "center",

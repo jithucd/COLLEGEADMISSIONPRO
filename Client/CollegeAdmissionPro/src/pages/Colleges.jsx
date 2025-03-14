@@ -60,7 +60,7 @@ const styles = {
   container: {
     padding: "40px",
     backgroundColor: "#f9fafc",
-    backgroundImage: "url('/carousel4.jpg')",
+    backgroundImage: "url('/images/carousel4.jpg')",
     backgroundRepeat: "no-repeat",
     backgroundSize: "cover",
     backgroundPosition: "center",
