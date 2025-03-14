@@ -1,79 +1,8 @@
-// import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
-// import { Link, useNavigate } from "react-router-dom";
-// import { useState, useEffect } from "react";
-
-// const NavigationBar = () => {
-//   const [isLoggedIn, setIsLoggedIn] = useState(false);
-//   const [userRole, setUserRole] = useState(null);
-//   const navigate = useNavigate();
-
-//   useEffect(() => {
-//     const token = localStorage.getItem("token");
-//     if (token) {
-//       setIsLoggedIn(true);
-//       // In a real app, you would decode the JWT to get user role
-//       // For now, we'll try to get it from localStorage if it exists
-//       const role = localStorage.getItem("userRole");
-//       if (role) setUserRole(role);
-//     }
-//   }, []);
-
-//   const handleLogout = () => {
-//     localStorage.removeItem("token");
-//     localStorage.removeItem("userRole");
-//     setIsLoggedIn(false);
-//     setUserRole(null);
-//     navigate("/login");
-//   };
-
-//   return (
-//     <Navbar bg="dark" variant="dark" expand="lg">
-//       <Container>
-//         <Navbar.Brand as={Link} to="/"> Services Management System</Navbar.Brand>
-//         <Navbar.Toggle aria-controls="basic-navbar-nav" />
-//         <Navbar.Collapse id="basic-navbar-nav">
-//           <Nav className="ms-auto">
-//             <Nav.Link as={Link} to="/colleges">Colleges</Nav.Link>
-//             <Nav.Link as={Link} to="/courses">Courses</Nav.Link>
-            
-//             {isLoggedIn ? (
-//               <>
-               
-//                 <NavDropdown title="Account" id="basic-nav-dropdown">
-                 
-//                   {userRole === "admin" && (
-//                   <NavDropdown.Item as={Link} to="/admin-dashboard">Admin Dashboard</NavDropdown.Item>
-//                 )}
-//                 {userRole === "college_admin" && (
-//                   <NavDropdown.Item as={Link} to="/college-admin-dashboard">College Dashboard</NavDropdown.Item>
-//                 )}
-//                    {userRole === "student" && (
-//                   <NavDropdown.Item as={Link} to="/dashboard">Dashboard</NavDropdown.Item>
-//                 )}
-//                   <NavDropdown.Item as={Link} to="/profile">Profile</NavDropdown.Item>
-//                   <NavDropdown.Divider />
-//                   <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
-//                 </NavDropdown>
-//               </>
-//             ) : (
-//               <>
-//                 <Nav.Link as={Link} to="/login">Login</Nav.Link>
-//                 <Nav.Link as={Link} to="/signup">Signup</Nav.Link>
-//               </>
-//             )}
-//           </Nav>
-//         </Navbar.Collapse>
-//       </Container>
-//     </Navbar>
-//   );
-// };
-
-// export default NavigationBar;
 import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { FaUniversity, FaBook, FaUserCircle } from "react-icons/fa";
+import { FaUniversity, FaBook, FaUserCircle, FaTachometerAlt } from "react-icons/fa";
 import styled from "styled-components";
-import { useAuth } from "../context/AuthContext";
+import { useAuth, ROLES } from "../context/AuthContext";
 
 const StyledNavbar = styled(Navbar)`
   background-color: #001a3a;
@@ -126,7 +55,8 @@ const StyledNavbar = styled(Navbar)`
 const NavigationBar = () => {
   const { isLoggedIn, userRole, logout } = useAuth();
   const navigate = useNavigate();
-
+  console.log("Navbar - isLoggedIn:", isLoggedIn);
+  console.log("Navbar - userRole:", userRole);
   const handleLogout = () => {
     logout();
     navigate("/login");
@@ -154,27 +84,32 @@ const NavigationBar = () => {
               Courses
             </Nav.Link>
 
+            {/* ✅ Directly use context state */}
+            {isLoggedIn && userRole === ROLES.ADMIN && (
+              <Nav.Link as={Link} to="/admin-dashboard">
+                <FaTachometerAlt />
+                Admin Dashboard
+              </Nav.Link>
+            )}
+            {isLoggedIn && userRole === ROLES.COLLEGE_ADMIN && (
+              <Nav.Link as={Link} to="/college-admin-dashboard">
+                <FaTachometerAlt />
+                College Dashboard
+              </Nav.Link>
+            )}
+            {isLoggedIn && userRole === ROLES.STUDENT && (
+              <Nav.Link as={Link} to="/dashboard">
+                <FaTachometerAlt />
+                Student Dashboard
+              </Nav.Link>
+            )}
+
             {isLoggedIn ? (
               <NavDropdown
                 title={<FaUserCircle style={{ fontSize: "1.5rem" }} />}
                 id="collapsible-nav-dropdown"
                 align="end"
               >
-                {userRole === "admin" && (
-                  <NavDropdown.Item as={Link} to="/admin-dashboard">
-                    Admin Dashboard
-                  </NavDropdown.Item>
-                )}
-                {userRole === "college_admin" && (
-                  <NavDropdown.Item as={Link} to="/college-admin-dashboard">
-                    College Dashboard
-                  </NavDropdown.Item>
-                )}
-                {userRole === "student" && (
-                  <NavDropdown.Item as={Link} to="/dashboard">
-                    Student Dashboard
-                  </NavDropdown.Item>
-                )}
                 <NavDropdown.Item as={Link} to="/profile">
                   Profile
                 </NavDropdown.Item>
@@ -185,10 +120,10 @@ const NavigationBar = () => {
               </NavDropdown>
             ) : (
               <div style={{ display: 'flex', gap: '1rem', marginLeft: '1rem' }}>
-                <Nav.Link as={Link} to="/login" className="login-button">
+                <Nav.Link as={Link} to="/login">
                   Login
                 </Nav.Link>
-                <Nav.Link as={Link} to="/signup" className="signup-button">
+                <Nav.Link as={Link} to="/signup">
                   Sign Up
                 </Nav.Link>
               </div>

@@ -40,6 +40,7 @@ export const signup = async (userData) => {
 export const login = async (credentials) => {
   try {
     const response = await axios.post("http://localhost:5000/api/auth/login", credentials, {
+     
       withCredentials: true,
      
     });
