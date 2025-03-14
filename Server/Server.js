@@ -24,7 +24,7 @@ const logger = require("./config/logger");
 
 // Middleware
 app.use(cors({
-  origin: "https://collegeadmissionpro-1.onrender.com/",
+  origin: "https://collegeadmissionpro-1.onrender.com",
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
