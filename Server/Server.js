@@ -10,7 +10,7 @@ const adminRoutes = require("./routes/adminRoutes");
 const collegeRoutes = require("./routes/collegeRoutes");
 const courseRoutes = require("./routes/courseRoutes");
 const userRoutes = require("./routes/userRoutes");
-const paymentRoutes = require("./routes/paymentRoutes");
+// const paymentRoutes = require("./routes/paymentRoutes");
 const cloudinary = require("./config/cloudinary");
 const admissionRoutes = require("./routes/admissionRoutes");
 const collegeAdminRoutes=require("./routes/collegeAdminRoutes");
@@ -24,7 +24,7 @@ const logger = require("./config/logger");
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: ['http://localhost:5173', 'https://your-frontend-service.onrender.com'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
@@ -44,7 +44,7 @@ app.use("/api/admin",adminRoutes)
 app.use("/api/colleges", collegeRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/payments", paymentRoutes);
+// app.use("/api/payments", paymentRoutes);
 app.use("/api/college-admin", collegeAdminRoutes);
 // Error handling middleware
 app.use(errorHandler);

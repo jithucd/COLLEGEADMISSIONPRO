@@ -13,11 +13,11 @@
 // };
 
 // module.exports = cors(corsOptions);
-import cors from 'cors';
+// import cors from 'cors';
 
-// Add this before your routes
-app.use(cors({
-  origin: 'http://localhost:5173', // Your Vite frontend port
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
-}));
+// // Add this before your routes
+// app.use(cors({
+//   origin: 'http://localhost:5173', // Your Vite frontend port
+//   methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//   credentials: true
+// }));
