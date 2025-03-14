@@ -1,35 +1,10 @@
-// import { useEffect, useState } from "react";
-// import { getAllCourses } from "../services/courses"; // Corrected import path
-// import CourseCard from "../components/CourseCard";
-
-// const Courses = () => {
-//   const [courses, setCourses] = useState([]);
-
-//   useEffect(() => {
-//     const fetchCourses = async () => {
-//       const response = await getAllCourses();
-//       setCourses(response);
-//     };
-//     fetchCourses();
-//   }, []);
-
-//   return (
-//     <div>
-//       <h1>Courses</h1>
-//       {courses.map((course) => (
-//         <CourseCard key={course._id} course={course} />
-//       ))}
-//     </div>
-//   );
-// };
-
-// export default Courses;
 import { useEffect, useState } from "react";
 import { getAllCourses } from "../services/courses";
 import CourseCard from "../components/CourseCard";
 
 const Courses = () => {
   const [courses, setCourses] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -47,15 +22,36 @@ const Courses = () => {
     fetchCourses();
   }, []);
 
+  // ✅ Filter courses based on title or college name
+  const filteredCourses = courses.filter(
+    (course) =>
+      course?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course?.college?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div style={styles.container}>
+      {/* ✅ Search Bar */}
+      <div style={styles.searchContainer}>
+        <input
+          type="text"
+          placeholder="Search by course or college..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={styles.searchInput}
+        />
+      </div>
+
       <h1 style={styles.header}>Courses</h1>
+
       <div style={styles.grid}>
-        {courses
-          .filter((course) => course && course.title) // ✅ Defensive check to avoid undefined values
-          .map((course) => (
+        {filteredCourses.length > 0 ? (
+          filteredCourses.map((course) => (
             <CourseCard key={course._id} course={course} />
-          ))}
+          ))
+        ) : (
+          <p style={styles.noResults}>No courses found</p>
+        )}
       </div>
     </div>
   );
@@ -66,10 +62,10 @@ const styles = {
     padding: "30px",
     backgroundColor: "#f9fafc",
     backgroundImage: "url('/signupbg.jpg')",
-      backgroundRepeat: "no-repeat",
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      minHeight: "100vh",
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    minHeight: "100vh",
   },
   header: {
     fontSize: "2.5rem",
@@ -84,6 +80,26 @@ const styles = {
     gap: "20px",
     justifyContent: "center",
     padding: "10px",
+  },
+  searchContainer: {
+    display: "flex",
+    justifyContent: "center",
+    marginBottom: "20px",
+  },
+  searchInput: {
+    width: "50%",
+    padding: "12px 16px",
+    borderRadius: "8px",
+    border: "1px solid #ccc",
+    fontSize: "16px",
+    outline: "none",
+    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+    transition: "border-color 0.3s ease",
+  },
+  noResults: {
+    textAlign: "center",
+    color: "#7f8c8d",
+    fontSize: "1.2rem",
   },
 };
 

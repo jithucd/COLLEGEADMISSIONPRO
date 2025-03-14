@@ -1,104 +1,4 @@
-// import { useState, useEffect } from "react";
-// import { signup } from "../services/auth";
-// import { getAllColleges } from "../services/admin"; // ✅ Import function to fetch colleges
-// import { useNavigate } from "react-router-dom";
-// import { Form, Button, Container, Alert } from "react-bootstrap";
-
-// const Signup = () => {
-//   const [name, setName] = useState("");
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const [role, setRole] = useState("student");
-//   const [collegeId, setCollegeId] = useState(""); // ✅ Store selected college
-//   const [colleges, setColleges] = useState([]); // ✅ Store list of colleges
-//   const [error, setError] = useState(null);
-//   const navigate = useNavigate();
-
-//   // Fetch colleges when component loads
-//   useEffect(() => {
-//     const fetchColleges = async () => {
-//       try {
-//         const data = await getAllColleges();
-//         setColleges(data);
-//       } catch (err) {
-//         console.error("Error fetching colleges:", err);
-//         setError("Failed to load colleges.");
-//       }
-//     };
-//     fetchColleges();
-//   }, []);
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     setError(null);
-
-//     try {
-//       // Include collegeId only if user selects "college_admin"
-//       const signupData = role === "college_admin" ? { name, email, password, role, collegeId } : { name, email, password, role };
-
-//       const response = await signup(signupData);
-//       localStorage.setItem("token", response.token);
-//       navigate("/dashboard");
-//     } catch (err) {
-//       setError(err.message);
-//     }
-//   };
-
-//   return (
-//     <Container className="mt-4">
-//       <h2>Signup</h2>
-//       {error && <Alert variant="danger">{error}</Alert>}
-//       <Form onSubmit={handleSubmit}>
-//         <Form.Group controlId="name">
-//           <Form.Label>Name</Form.Label>
-//           <Form.Control type="text" value={name} onChange={(e) => setName(e.target.value)} required />
-//         </Form.Group>
-
-//         <Form.Group controlId="email" className="mt-2">
-//           <Form.Label>Email</Form.Label>
-//           <Form.Control type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-//         </Form.Group>
-
-//         <Form.Group controlId="password" className="mt-2">
-//           <Form.Label>Password</Form.Label>
-//           <Form.Control type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-//         </Form.Group>
-
-//         <Form.Group controlId="role" className="mt-2">
-//           <Form.Label>Role</Form.Label>
-//           <Form.Select value={role} onChange={(e) => setRole(e.target.value)}>
-//             <option value="student">Student</option>
-//             <option value="college_admin">College Admin</option>
-//           </Form.Select>
-//         </Form.Group>
-
-//         {/* Show college dropdown only if role is "college_admin" */}
-//         {role === "college_admin" && (
-//           <Form.Group controlId="collegeId" className="mt-2">
-//             <Form.Label>Select College</Form.Label>
-//             <Form.Select value={collegeId} onChange={(e) => setCollegeId(e.target.value)} required>
-//               <option value="">Select a College</option>
-//               {colleges.map((college) => (
-//                 <option key={college._id} value={college._id}>
-//                   {college.name}
-//                 </option>
-//               ))}
-//             </Form.Select>
-//           </Form.Group>
-//         )}
-
-//         <Button variant="success" type="submit" className="mt-3">
-//           Signup
-//         </Button>
-//       </Form>
-//     </Container>
-//   );
-// };
-
-// export default Signup;
-import { useState, useEffect } from "react";
-import { signup } from "../services/auth";
-import { getAllColleges } from "../services/admin";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Container, Alert, Row, Col } from "react-bootstrap";
 
@@ -107,78 +7,116 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("student");
-  const [collegeId, setCollegeId] = useState("");
-  const [colleges, setColleges] = useState([]);
+  const [collegeName, setCollegeName] = useState("");
+  const [collegeLocation, setCollegeLocation] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchColleges = async () => {
-      try {
-        const data = await getAllColleges();
-        setColleges(data);
-      } catch (err) {
-        console.error("Error fetching colleges:", err);
-        setError("Failed to load colleges.");
-      }
-    };
-    fetchColleges();
-  }, []);
+  // ✅ Handle file selection
+  const handleFileChange = (e) => {
+    if (e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
 
+  // ✅ Upload file to Cloudinary using fetch
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      throw new Error("Please select a file first");
+    }
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("upload_preset", "college_docs"); // ✅ Your Cloudinary preset
+
+    try {
+      const response = await fetch(
+        "https://api.cloudinary.com/v1_1/djx9ffzob/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to upload file: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log("File uploaded successfully:", data.secure_url);
+      return data.secure_url;
+    } catch (error) {
+      console.error("Upload failed:", error);
+      throw new Error("Failed to upload file");
+    }
+  };
+
+  // ✅ Handle signup request
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
     try {
-      const signupData =
-        role === "college_admin"
-          ? { name, email, password, role, collegeId }
-          : { name, email, password, role };
+      let uploadedProofUrl = null;
 
-      const response = await signup(signupData);
-      localStorage.setItem("token", response.token);
+      // ✅ Upload the file if user is a college admin
+      if (role === "college_admin" && selectedFile) {
+        uploadedProofUrl = await handleUpload();
+      }
+
+      // ✅ Clean up input data
+      const signupData =
+      role === "college_admin"
+        ? {
+            name: name.trim(),
+            email: email.trim(),
+            password: password.trim(),
+            role,
+            college: {
+              name: collegeName.trim(),
+              location: collegeLocation.trim(),
+              proof: uploadedProofUrl || null,
+            },
+          }
+        : {
+            name: name.trim(),
+            email: email.trim(),
+            password: password.trim(),
+            role,
+            college: null,
+          };
+    
+    const response = await fetch("http://localhost:5000/api/auth/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(
+        JSON.parse(JSON.stringify(signupData))
+      ),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Signup Error Response:", errorData);
+      throw new Error(errorData.message || "Signup failed");
+    }
+    
+
+      const data = await response.json();
+      console.log("Signup Success:", data);
+      localStorage.setItem("token", data.token);
       navigate("/dashboard");
-    } catch (err) {
-      setError(err.message);
+    } catch (error) {
+      console.error("Signup failed:", error);
+      setError(error.message || "Signup failed");
     }
   };
 
   return (
-    <Container
-      fluid
-      style={{
-        backgroundColor:"whitesmoke",
-        backgroundImage: "url('/signup5.jfif')",
-        backgroundRepeat: "no-repeat", // Prevents the image from repeating
-        backgroundSize: "cover", // Ensures the image covers the entire element
-        backgroundPosition: "center", // Centers the image
-        width: "100%",
-        height: "300px",
-      
-        minHeight: "100vh",
-        padding: "2rem 0",
-      }}
-    >
-      {/* <div
-        style={{
-          textAlign: "center",
-          marginBottom: "3rem",
-          padding: "2rem 0",
-          backgroundColor: "#fff",
-          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <img
-          src="/manipal-logo.png"
-          alt="Manipal Logo"
-          style={{ height: "80px" }}
-        />
-        <h1 style={{ marginTop: "1rem", color: "#004a7c" }}>
-          Create Your Account
-        </h1>
-      </div> */}
-
-      <Row className="justify-content-center"  >
+    <Container fluid style={{ padding: "2rem", minHeight: "100vh" }}>
+      <Row className="justify-content-center">
         <Col md={8} lg={6}>
           {error && (
             <Alert variant="danger" className="text-center">
@@ -186,53 +124,27 @@ const Signup = () => {
             </Alert>
           )}
 
-          <Form
-            onSubmit={handleSubmit}
-            style={{
-              backgroundColor: "white",
-              padding: "2rem",
-              borderRadius: "10px",
-              boxShadow: "0 0 15px rgba(0, 0, 0, 0.4)",
-             
-            }}
-          >
+          <Form onSubmit={handleSubmit} style={{ padding: "2rem", backgroundColor: "#fff", borderRadius: "10px" }}>
             <Row>
               <Col md={6}>
                 <Form.Group style={{ marginBottom: "1.5rem" }}>
-                  <Form.Label>
-                    Full Name <span style={{ color: "red" }}>*</span>
-                  </Form.Label>
+                  <Form.Label>Full Name</Form.Label>
                   <Form.Control
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    style={{
-                      border: "2px solid #e9ecef",
-                      borderRadius: "5px",
-                      padding: "12px 15px",
-                      transition: "border-color 0.3s ease",
-                    }}
                   />
                 </Form.Group>
               </Col>
-
               <Col md={6}>
                 <Form.Group style={{ marginBottom: "1.5rem" }}>
-                  <Form.Label>
-                    Email <span style={{ color: "red" }}>*</span>
-                  </Form.Label>
+                  <Form.Label>Email</Form.Label>
                   <Form.Control
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    style={{
-                      border: "2px solid #e9ecef",
-                      borderRadius: "5px",
-                      padding: "12px 15px",
-                      transition: "border-color 0.3s ease",
-                    }}
                   />
                 </Form.Group>
               </Col>
@@ -241,38 +153,22 @@ const Signup = () => {
             <Row>
               <Col md={6}>
                 <Form.Group style={{ marginBottom: "1.5rem" }}>
-                  <Form.Label>
-                    Password <span style={{ color: "red" }}>*</span>
-                  </Form.Label>
+                  <Form.Label>Password</Form.Label>
                   <Form.Control
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    style={{
-                      border: "2px solid #e9ecef",
-                      borderRadius: "5px",
-                      padding: "12px 15px",
-                      transition: "border-color 0.3s ease",
-                    }}
                   />
                 </Form.Group>
               </Col>
-
               <Col md={6}>
                 <Form.Group style={{ marginBottom: "1.5rem" }}>
-                  <Form.Label>
-                    Role <span style={{ color: "red" }}>*</span>
-                  </Form.Label>
+                  <Form.Label>Role</Form.Label>
                   <Form.Select
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
-                    style={{
-                      border: "2px solid #e9ecef",
-                      borderRadius: "5px",
-                      padding: "12px 15px",
-                      transition: "border-color 0.3s ease",
-                    }}
+                    required
                   >
                     <option value="student">Student</option>
                     <option value="college_admin">College Admin</option>
@@ -282,59 +178,37 @@ const Signup = () => {
             </Row>
 
             {role === "college_admin" && (
-              <Form.Group style={{ marginBottom: "1.5rem" }}>
-                <Form.Label>
-                  Select College <span style={{ color: "red" }}>*</span>
-                </Form.Label>
-                <Form.Select
-                  value={collegeId}
-                  onChange={(e) => setCollegeId(e.target.value)}
-                  required
-                  style={{
-                    border: "2px solid #e9ecef",
-                    borderRadius: "5px",
-                    padding: "12px 15px",
-                    transition: "border-color 0.3s ease",
-                  }}
-                >
-                  <option value="">Select your college</option>
-                  {colleges.map((college) => (
-                    <option key={college._id} value={college._id}>
-                      {college.name}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
+              <>
+                <Form.Group style={{ marginBottom: "1.5rem" }}>
+                  <Form.Label>College Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={collegeName}
+                    onChange={(e) => setCollegeName(e.target.value)}
+                    required
+                  />
+                </Form.Group>
+
+                <Form.Group style={{ marginBottom: "1.5rem" }}>
+                  <Form.Label>College Location</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={collegeLocation}
+                    onChange={(e) => setCollegeLocation(e.target.value)}
+                    required
+                  />
+                </Form.Group>
+
+                <Form.Group style={{ marginBottom: "1.5rem" }}>
+                  <Form.Label>Upload Proof</Form.Label>
+                  <Form.Control type="file" onChange={handleFileChange} required />
+                </Form.Group>
+              </>
             )}
 
-            <div style={{ textAlign: "center", marginTop: "2rem" }}>
-              <Button
-                type="submit"
-                style={{
-                  backgroundColor: "#004a7c",
-                  border: "none",
-                  padding: "12px 30px",
-                  fontSize: "1.1rem",
-                  transition: "background-color 0.3s ease",
-                }}
-              >
-                Create Account
-              </Button>
-            </div>
-
-            <p style={{ textAlign: "center", marginTop: "2rem" }}>
-              Already have an account?{" "}
-              <a
-                href="/login"
-                style={{
-                  color: "#004a7c",
-                  textDecoration: "none",
-                  fontWeight: "500",
-                }}
-              >
-                Login here
-              </a>
-            </p>
+            <Button type="submit" className="mt-3 w-100">
+              Create Account
+            </Button>
           </Form>
         </Col>
       </Row>
