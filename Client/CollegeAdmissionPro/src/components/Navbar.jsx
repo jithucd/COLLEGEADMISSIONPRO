@@ -1,138 +1,70 @@
-import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { FaUniversity, FaBook, FaUserCircle, FaTachometerAlt } from "react-icons/fa";
-import styled from "styled-components";
-import { useAuth, ROLES } from "../context/AuthContext";
-
-const StyledNavbar = styled(Navbar)`
-  background-color: #001a3a;
-  border-bottom: 3px solid #ffb300;
-  padding: 0.5rem 0;
-
-  .navbar-brand {
-    color: white !important;
-    font-size: 1.5rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: 'Roboto', sans-serif;
-  }
-
-  .nav-link {
-    color: white !important;
-    font-weight: 500;
-    position: relative;
-    padding: 8px 0 !important;
-    transition: all 0.3s ease !important;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    &:hover {
-      color: #ffb300 !important;
-      transform: translateY(-2px);
-    }
-
-    &::after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 2px;
-      bottom: 0;
-      left: 0;
-      background-color: #ffb300;
-      transition: width 0.3s ease;
-    }
-
-    &:hover::after {
-      width: 100%;
-    }
-   
-  }
-`;
+import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
+import { useAuth } from "../context/AuthContext";
+const dashboardRoutes = {
+  admin: "/admin-dashboard",
+  college_admin: "/college-admin-dashboard",
+  student: "/dashboard",
+};
 
 const NavigationBar = () => {
-  const { isLoggedIn, userRole, logout } = useAuth();
   const navigate = useNavigate();
-  console.log("Navbar - isLoggedIn:", isLoggedIn);
-  console.log("Navbar - userRole:", userRole);
+  const { isLoggedIn, userRole, logout } = useAuth();
+
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
   return (
-    <StyledNavbar collapseOnSelect expand="lg">
-      <Container fluid style={{ maxWidth: "1200px", padding: "0 20px" }}>
-        <Navbar.Brand as={Link} to="/">
-          <FaUniversity style={{ fontSize: "1.8rem" }} />
+    <Navbar bg="dark" variant="dark" expand="lg" className="py-3">
+      <Container>
+        <Navbar.Brand as={Link} to="/" className="fw-bold text-white">
           Services Management System
         </Navbar.Brand>
 
-        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-        
-        <Navbar.Collapse id="responsive-navbar-nav">
-          <Nav className="ms-auto" style={{ gap: "1.5rem", alignItems: "center" }}>
-            <Nav.Link as={Link} to="/colleges">
-              <FaUniversity />
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="ms-auto">
+            {/* ✅ Always visible */}
+            <Nav.Link as={Link} to="/colleges" className="text-white">
               Colleges
             </Nav.Link>
-            
-            <Nav.Link as={Link} to="/courses">
-              <FaBook />
+            <Nav.Link as={Link} to="/courses" className="text-white">
               Courses
             </Nav.Link>
 
-            {/* ✅ Directly use context state */}
-            {isLoggedIn && userRole === ROLES.ADMIN && (
-              <Nav.Link as={Link} to="/admin-dashboard">
-                <FaTachometerAlt />
-                Admin Dashboard
-              </Nav.Link>
-            )}
-            {isLoggedIn && userRole === ROLES.COLLEGE_ADMIN && (
-              <Nav.Link as={Link} to="/college-admin-dashboard">
-                <FaTachometerAlt />
-                College Dashboard
-              </Nav.Link>
-            )}
-            {isLoggedIn && userRole === ROLES.STUDENT && (
-              <Nav.Link as={Link} to="/dashboard">
-                <FaTachometerAlt />
-                Student Dashboard
+             {/* ✅ Single logic for Dashboard */}
+             {isLoggedIn && dashboardRoutes[userRole] && (
+              <Nav.Link as={Link} to={dashboardRoutes[userRole]} className="text-white">
+                Dashboard
               </Nav.Link>
             )}
 
+            {/* ✅ Profile + Logout in Dropdown */}
             {isLoggedIn ? (
-              <NavDropdown
-                title={<FaUserCircle style={{ fontSize: "1.5rem" }} />}
-                id="collapsible-nav-dropdown"
-                align="end"
-              >
+              <NavDropdown title="Account" id="basic-nav-dropdown">
                 <NavDropdown.Item as={Link} to="/profile">
                   Profile
                 </NavDropdown.Item>
-                <NavDropdown.Divider />
                 <NavDropdown.Item onClick={handleLogout}>
                   Logout
                 </NavDropdown.Item>
               </NavDropdown>
             ) : (
-              <div style={{ display: 'flex', gap: '1rem', marginLeft: '1rem' }}>
-                <Nav.Link as={Link} to="/login">
+              <>
+                <Nav.Link as={Link} to="/login" className="text-white">
                   Login
                 </Nav.Link>
-                <Nav.Link as={Link} to="/signup">
+                <Nav.Link as={Link} to="/signup" className="text-white">
                   Sign Up
                 </Nav.Link>
-              </div>
+              </>
             )}
           </Nav>
         </Navbar.Collapse>
       </Container>
-    </StyledNavbar>
+    </Navbar>
   );
 };
 

@@ -142,22 +142,30 @@ export const updateAdmissionStatus = async (admissionId, status) => {
 
 export const toggleCollegeStatus = async (collegeId, isActive, token) => {
   try {
-    console.log("Toggling college status for:", collegeId, "Set active:", isActive);
-    const response = await fetch(`${API_URL}/colleges/${collegeId}/status`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ active: isActive })
-    });
+    const response = await fetch(
+      `${API_URL}/admin/colleges/${collegeId}/status`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ active: isActive }),
+      }
+    );
 
-    if (!response.ok) throw new Error("Failed to toggle college status");
-    return await response.json();
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to toggle college status");
+    }
+
+    const data = await response.json();
+    return data.college; // ✅ Return the updated college object
   } catch (error) {
     throw new Error(error.message || "Failed to toggle college status");
   }
 };
+
 
 export const toggleUserStatus = async (userId, isActive, token) => {
   try {
@@ -183,3 +191,20 @@ export const toggleUserStatus = async (userId, isActive, token) => {
     throw new Error(error.message || "Failed to toggle user status");
   }
 };
+
+export const getCollegeProof = async (collegeId, token) => {
+  try {
+    const response = await fetch(`${API_URL}/admin/colleges/${collegeId}/proof`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) throw new Error("Failed to fetch proof document");
+    return await response.json();
+  } catch (error) {
+    throw new Error(error.message || "Failed to fetch proof document");
+  }
+};
+

@@ -17,7 +17,11 @@ exports.getAdmissions = async (req, res) => {
     path: 'user',
     select: 'name email' // ✅ Include only necessary fields
   })
-  .populate('course college');
+  .populate('course college')
+  .populate({
+    path: "user",
+    select: "name email certificateUrl", // ✅ Directly populate certificateUrl
+  });
 
       
     res.json(admissions);
@@ -123,5 +127,20 @@ exports.updateCourse = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to update course" });
+  }
+};
+exports.getCollegeProof = async (req, res) => {
+  try {
+    const collegeId = req.params.id;
+    const collegeAdmin = await CollegeAdmin.findById(collegeId);
+    
+    if (!collegeAdmin || !collegeAdmin.proofUrl) {
+      return res.status(404).json({ error: "Proof not found" });
+    }
+
+    res.status(200).json({ proofUrl: collegeAdmin.proofUrl });
+  } catch (error) {
+    console.error("Error fetching proof:", error);
+    res.status(500).json({ error: "Failed to fetch proof" });
   }
 };

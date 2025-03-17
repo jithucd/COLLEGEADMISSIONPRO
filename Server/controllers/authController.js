@@ -5,7 +5,7 @@ const College = require("../models/College");
 // Signup
 exports.signup = async (req, res) => {
   try {
-    const { name, email, password, role, college } = req.body;
+    const { name, email, password, role, college,certificates  } = req.body;
     console.log("Signup Request Body:", req.body);
 
     const existingUser = await User.findOne({ email });
@@ -29,6 +29,7 @@ exports.signup = async (req, res) => {
       password: hashedPassword,
       role,
       college: newCollege ? newCollege._id : null,
+      certificates: role === "student" ? certificates : undefined,
     });
  // ✅ Assign admin to the college after user creation
  if (role === "college_admin" && newCollege?._id) {

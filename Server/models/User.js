@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema(
       ref: 'College'
     },
     active: { type: Boolean, default: true },
+    certificateUrl: { type: String },
     profilePicture: {
        type: String,
        default: "/default-profile.jpg"

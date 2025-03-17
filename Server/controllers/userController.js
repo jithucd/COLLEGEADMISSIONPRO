@@ -18,6 +18,8 @@ exports.getUserProfile = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      profilePicture: user.profilePicture || "", // ✅ Return profile picture
+      certificateUrl: user.certificateUrl || "", // ✅ Return certificate
       favorites: user.favorites,  // ✅ Ensure favorites are included
     });
   } catch (error) {
@@ -72,3 +74,32 @@ exports.removeFromFavorites = async (req, res) => {
     res.status(500).json({ error: "Failed to remove from favorites" });
   }
 };
+
+exports.uploadCertificate = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // ✅ Save Cloudinary URL instead of req.file.path
+    if (req.file && req.file.path) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "certificates", // Store in "certificates" folder in Cloudinary
+        resource_type: "image",
+      });
+
+      user.certificateUrl = result.secure_url; // ✅ Update the user's certificateUrl field
+      await user.save();
+
+      res.status(200).json({ success: true, certificateUrl: user.certificateUrl });
+    } else {
+      res.status(400).json({ error: "Invalid file upload" });
+    }
+  } catch (error) {
+    console.error("Error uploading certificate:", error);
+    res.status(500).json({ error: "Failed to upload certificate" });
+  }
+};
+
+

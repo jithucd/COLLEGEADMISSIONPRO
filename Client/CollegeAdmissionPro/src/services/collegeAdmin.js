@@ -2,6 +2,7 @@
 
 // const API_URL = "http://localhost:5000/api";
 const API_URL = `${import.meta.env.VITE_API_URL}/api`;
+import axios from 'axios';
 
 export const getCollegeAdmissions = async () => {
   const token = localStorage.getItem("token");
@@ -9,18 +10,27 @@ export const getCollegeAdmissions = async () => {
     const response = await fetch(`${API_URL}/college-admin/admissions`, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
+
     if (!response.ok) {
       throw new Error("Failed to fetch college admissions");
     }
+
     const data = await response.json();
-    return data;
+    console.log("API Response:", data); 
+  
+    
+    return data.map(admission => ({
+      ...admission,
+      certificateUrl: admission.user?.certificateUrl || null, // ✅ Assign certificateUrl correctly
+    }));
   } catch (error) {
     throw new Error(error.message || "Failed to fetch college admissions");
   }
 };
+
 
 export const updateAdmissionStatus = async (admissionId, status) => {
   const token = localStorage.getItem("token");
@@ -70,7 +80,8 @@ export const getCollegeAdminData = async () => {
     const response = await fetch(`${API_URL}/college-admin`, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
       }
     });
     if (!response.ok) {
@@ -118,3 +129,18 @@ export const updateCourse = async (courseId, updatedCourse) => {
 
   return response.json();
 };
+
+export const updateCollegeDetails = async (collegeId, updatedData, token) => {
+  const response = await axios.put(
+    `${import.meta.env.VITE_API_URL}/api/colleges/${collegeId}`,
+    updatedData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    }
+  );
+  return response.data;
+};
+

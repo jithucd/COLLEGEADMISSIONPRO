@@ -105,33 +105,32 @@ exports.getAllColleges = async (req, res) => {
   }
 };
 // Toggle College Status
-exports.toggleCollegeStatus = async (req, res) => {
-  try {
-    console.log("🔄 Toggle College Status Request:", req.params.collegeId, "Set active:", req.body.active);
 
-    // Find the college before updating
-    let college = await College.findById(req.params.collegeId);
-    if (!college) {
-      console.log("❌ College not found");
+
+exports.toggleCollegeStatus = async (req, res) => {
+  const { collegeId } = req.params;
+  const { active } = req.body;
+
+  try {
+    const updatedCollege = await College.findByIdAndUpdate(
+      collegeId,
+      { active },
+      { new: true } // ✅ Return the updated document
+    );
+
+    if (!updatedCollege) {
       return res.status(404).json({ error: "College not found" });
     }
 
-    console.log("✅ College before update:", college);
-
-    // Update the college status
-    college.active = req.body.active;
-    await college.save();  // Saving the update
-
-    // Verify the update
-    college = await College.findById(req.params.collegeId);
-    console.log("✅ College after update:", college);
-
-    res.json({ success: true, college });
-  } catch (err) {
-    console.error("❌ Failed to toggle college status:", err);
-    res.status(500).json({ error: "Failed to toggle college status" });
+    res.status(200).json({ success: true, college: updatedCollege });
+  } catch (error) {
+    console.error("Error toggling college status:", error);
+    res.status(500).json({ error: "Failed to update college status" });
   }
 };
+
+
+
 
 
 // Toggle User Status
@@ -176,3 +175,23 @@ exports.toggleUserStatus = async (req, res) => {
     res.status(500).json({ error: "Failed to toggle user status" });
   }
 };
+
+// Get college proof image
+exports.getCollegeProof = async (req, res) => {
+  try {
+    const college = await College.findById(req.params.collegeId);
+    if (!college) {
+      return res.status(404).json({ error: "College not found" });
+    }
+
+    if (!college.proofUrl) {
+      return res.status(404).json({ error: "No proof document available" });
+    }
+
+    res.json({ proofUrl: college.proofUrl });
+  } catch (err) {
+    console.error("❌ Failed to get proof document:", err);
+    res.status(500).json({ error: "Failed to get proof document" });
+  }
+};
+

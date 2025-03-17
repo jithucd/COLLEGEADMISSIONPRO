@@ -9,14 +9,18 @@ const Signup = () => {
   const [role, setRole] = useState("student");
   const [collegeName, setCollegeName] = useState("");
   const [collegeLocation, setCollegeLocation] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
+  // const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState(null);
+  const [proofFile, setProofFile] = useState(null);
+  const [certificatesFile, setCertificatesFile] = useState(null);
   const navigate = useNavigate();
 
   // ✅ Handle file selection
   const handleFileChange = (e) => {
     if (e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
+      // setSelectedFile(e.target.files[0]);
+      if (type === "proof") setProofFile(e.target.files[0]);
+      if (type === "certificates") setCertificatesFile(e.target.files[0]);
     }
   };
 
@@ -58,13 +62,16 @@ const Signup = () => {
     setError(null);
 
     try {
-      let uploadedProofUrl = null;
+      let proofUrl  = null;
+      let certificatesUrl = null;
 
       // ✅ Upload the file if user is a college admin
       if (role === "college_admin" && selectedFile) {
-        uploadedProofUrl = await handleUpload();
+        proofUrl  = await handleUpload();
       }
-
+      if (role === "student" && certificatesFile) {
+        certificatesUrl = await uploadToCloudinary(certificatesFile);
+      }
       // ✅ Clean up input data
       const signupData =
       role === "college_admin"
@@ -76,7 +83,7 @@ const Signup = () => {
             college: {
               name: collegeName.trim(),
               location: collegeLocation.trim(),
-              proof: uploadedProofUrl || null,
+              proof: proofUrl || null,
             },
           }
         : {
@@ -84,7 +91,8 @@ const Signup = () => {
             email: email.trim(),
             password: password.trim(),
             role,
-            college: null,
+            certificates: certificatesUrl || null,
+           
           };
     
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/signup`, {
@@ -113,7 +121,9 @@ const Signup = () => {
       setError(error.message || "Signup failed");
     }
   };
-
+  
+  
+  
   return (
     <Container fluid  style={{
       backgroundColor: "whitesmoke",
@@ -213,7 +223,12 @@ const Signup = () => {
                 </Form.Group>
               </>
             )}
-
+  {/* {role === "student" && (
+              <Form.Group>
+                <Form.Label>Upload Certificates</Form.Label>
+                <Form.Control type="file" onChange={handleUploadCertificate} />
+              </Form.Group>
+            )} */}
             <Button type="submit" className="mt-3 w-100">
               Create Account
             </Button>

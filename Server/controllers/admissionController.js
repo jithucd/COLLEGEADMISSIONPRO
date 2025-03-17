@@ -92,15 +92,52 @@ export const updateAdmissionStatus = async (req, res) => {
 
 export const getUserAdmissions = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const admissions = await Admission.aggregate([
+      {
+        $lookup: {
+          from: "users", // ✅ Join with User collection
+          localField: "user",
+          foreignField: "_id",
+          as: "user"
+        }
+      },
+      { $unwind: "$user" }, // ✅ Flatten the user object
+      {
+        $lookup: {
+          from: "colleges", // ✅ Join with College collection
+          localField: "college",
+          foreignField: "_id",
+          as: "college"
+        }
+      },
+      { $unwind: "$college" },
+      {
+        $lookup: {
+          from: "courses", // ✅ Join with Course collection
+          localField: "course",
+          foreignField: "_id",
+          as: "course"
+        }
+      },
+      { $unwind: "$course" },
+      {
+        $project: {
+          _id: 1,
+          status: 1,
+          "user._id": 1,
+          "user.name": 1,
+          "user.email": 1,
+          "user.certificateUrl": 1, // ✅ Directly pull certificateUrl
+          "college._id": 1,
+          "college.name": 1,
+          "college.proofUrl": 1,
+          "course._id": 1,
+          "course.title": 1
+        }
+      }
+    ]);
 
-    const admissions = await Admission.find({ user: userId })
-      .populate("course", "title")
-      .populate("college", "name");
-
-    // if (!admissions.length) {
-    //   return res.status(404).json({ error: "No admission records found" });
-    // }
+    console.log("Aggregated Admissions:", admissions);
 
     res.json(admissions);
   } catch (error) {
@@ -108,6 +145,9 @@ export const getUserAdmissions = async (req, res) => {
     res.status(500).json({ error: "Server error while fetching admissions" });
   }
 };
+
+
+  
 
 export const approveAdmission = async (req, res) => {
   try {

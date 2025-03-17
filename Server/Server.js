@@ -16,7 +16,7 @@ const admissionRoutes = require("./routes/admissionRoutes");
 const collegeAdminRoutes=require("./routes/collegeAdminRoutes");
 dotenv.config();
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 5000;
 
 connectDB();
 
@@ -24,7 +24,7 @@ const logger = require("./config/logger");
 
 // Middleware
 app.use(cors({
-  origin: "https://collegeadmissionpro-1.onrender.com",
+  origin: ['http://localhost:5173', 'https://collegeadmissionpro-1.onrender.com'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true

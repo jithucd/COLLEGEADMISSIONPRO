@@ -1,162 +1,13 @@
-// import { useState, useEffect } from "react";
-// import { Container, Form, Button, Alert, Row, Col, Image } from "react-bootstrap";
-// import { getProfile, updateProfile, uploadProfilePicture } from "../services/user";
-
-// const Profile = () => {
-//   const [profile, setProfile] = useState({
-//     name: "",
-//     email: "",
-//     profilePicture: ""
-//   });
-//   const [isEditing, setIsEditing] = useState(false);
-//   const [updateData, setUpdateData] = useState({
-//     name: "",
-//     email: ""
-//   });
-//   const [message, setMessage] = useState({ type: "", text: "" });
-//   const [selectedFile, setSelectedFile] = useState(null);
-//   const [isUploading, setIsUploading] = useState(false);
-
-//   useEffect(() => {
-//     const fetchProfile = async () => {
-//       try {
-//         const token = localStorage.getItem("token");
-//         if (!token) return;
-
-//         const userData = await getProfile();
-//         setProfile(userData);
-//         setUpdateData({
-//           name: userData.name,
-//           email: userData.email
-//         });
-//       } catch (error) {
-//         setMessage({ type: "danger", text: "Failed to load profile" });
-//       }
-//     };
-
-//     fetchProfile();
-//   }, []);
-
-//   const handleUpdateProfile = async (e) => {
-//     e.preventDefault();
-//     try {
-//       const response = await updateProfile(updateData);
-//       setProfile(response.user);
-//       setMessage({ type: "success", text: "Profile updated successfully" });
-//       setIsEditing(false);
-//     } catch (error) {
-//       setMessage({ type: "danger", text: error.message || "Failed to update profile" });
-//     }
-//   };
-
-//   const handleFileChange = (e) => {
-//     setSelectedFile(e.target.files[0]);
-//   };
-
-//   const handleUpload = async () => {
-//     if (!selectedFile) {
-//       setMessage({ type: "warning", text: "Please select a file first" });
-//       return;
-//     }
-
-//     try {
-//       setIsUploading(true);
-//       const formData = new FormData();
-//       formData.append("image", selectedFile);
-
-//       const response = await uploadProfilePicture(formData);
-//       setProfile({ ...profile, profilePicture: response.imageUrl });
-//       setMessage({ type: "success", text: "Profile picture uploaded successfully" });
-//     } catch (error) {
-//       setMessage({ type: "danger", text: "Failed to upload profile picture" });
-//     } finally {
-//       setIsUploading(false);
-//       setSelectedFile(null);
-//     }
-//   };
-
-//   return (
-//     <Container className="py-4">
-//       <h1>Your Profile</h1>
-//       {message.text && (
-//         <Alert variant={message.type} dismissible onClose={() => setMessage({ type: "", text: "" })}>
-//           {message.text}
-//         </Alert>
-//       )}
-
-//       <Row className="mt-4">
-//         <Col md={4} className="text-center mb-4">
-//           {profile.profilePicture ? (
-//             <Image src={profile.profilePicture} roundedCircle style={{ width: "200px", height: "200px", objectFit: "cover" }} />
-//           ) : (
-//             <div className="bg-secondary rounded-circle mx-auto d-flex align-items-center justify-content-center" style={{ width: "200px", height: "200px" }}>
-//               <span className="text-white h1">{profile.name?.charAt(0).toUpperCase()}</span>
-//             </div>
-//           )}
-
-//           <div className="mt-3">
-//             <Form.Group controlId="profilePicture">
-//               <Form.Label>Update Profile Picture</Form.Label>
-//               <Form.Control type="file" onChange={handleFileChange} accept="image/*" />
-//             </Form.Group>
-//             <Button variant="primary" onClick={handleUpload} className="mt-2" disabled={isUploading || !selectedFile}>
-//               {isUploading ? "Uploading..." : "Upload"}
-//             </Button>
-//           </div>
-//         </Col>
-
-//         <Col md={8}>
-//           {isEditing ? (
-//             <Form onSubmit={handleUpdateProfile}>
-//               <Form.Group controlId="name" className="mb-3">
-//                 <Form.Label>Name</Form.Label>
-//                 <Form.Control
-//                   type="text"
-//                   value={updateData.name}
-//                   onChange={(e) => setUpdateData({ ...updateData, name: e.target.value })}
-//                   required
-//                 />
-//               </Form.Group>
-
-//               <Form.Group controlId="email" className="mb-3">
-//                 <Form.Label>Email</Form.Label>
-//                 <Form.Control
-//                   type="email"
-//                   value={updateData.email}
-//                   onChange={(e) => setUpdateData({ ...updateData, email: e.target.value })}
-//                   required
-//                 />
-//               </Form.Group>
-
-//               <div className="d-flex gap-2">
-//                 <Button variant="primary" type="submit">Save Changes</Button>
-//                 <Button variant="secondary" onClick={() => setIsEditing(false)}>Cancel</Button>
-//               </div>
-//             </Form>
-//           ) : (
-//             <div>
-//               <p><strong>Name:</strong> {profile.name}</p>
-//               <p><strong>Email:</strong> {profile.email}</p>
-//               <p><strong>Role:</strong> {profile.role || "Student"}</p>
-//               <Button variant="primary" onClick={() => setIsEditing(true)}>Edit Profile</Button>
-//             </div>
-//           )}
-//         </Col>
-//       </Row>
-//     </Container>
-//   );
-// };
-
-// export default Profile;
 import { useState, useEffect } from "react";
-import { Container, Form, Button, Alert, Row, Col, Image } from "react-bootstrap";
-import { getProfile, updateProfile, uploadProfilePicture } from "../services/user";
+import { Container, Form, Button, Alert, Row, Col, Card, Image } from "react-bootstrap";
+import { getProfile, updateProfile, uploadProfilePicture, uploadCertificate } from "../services/user";
 
 const Profile = () => {
   const [profile, setProfile] = useState({
     name: "",
     email: "",
-    profilePicture: ""
+    profilePicture: "",
+    certificateUrl: ""
   });
   const [isEditing, setIsEditing] = useState(false);
   const [updateData, setUpdateData] = useState({
@@ -166,7 +17,9 @@ const Profile = () => {
   const [message, setMessage] = useState({ type: "", text: "" });
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [certificateFile, setCertificateFile] = useState(null);
 
+  // ✅ Fetch Profile Data and Ensure Certificate URL is Set Properly
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -174,7 +27,15 @@ const Profile = () => {
         if (!token) return;
 
         const userData = await getProfile();
-        setProfile(userData);
+        console.log("Fetched Profile Data:", userData);
+
+        setProfile({
+          name: userData.name,
+          email: userData.email,
+          profilePicture: userData.profilePicture || "",
+          certificateUrl: userData.certificateUrl || "" // ✅ Ensure certificateUrl is set
+        });
+
         setUpdateData({
           name: userData.name,
           email: userData.email
@@ -187,11 +48,16 @@ const Profile = () => {
     fetchProfile();
   }, []);
 
+  // ✅ Handle Profile Update
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     try {
       const response = await updateProfile(updateData);
-      setProfile(response.user);
+      setProfile((prev) => ({
+        ...prev,
+        name: response.user.name,
+        email: response.user.email
+      }));
       setMessage({ type: "success", text: "Profile updated successfully" });
       setIsEditing(false);
     } catch (error) {
@@ -199,9 +65,8 @@ const Profile = () => {
     }
   };
 
-  const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
-  };
+  // ✅ Handle Profile Picture Upload
+  const handleFileChange = (e) => setSelectedFile(e.target.files[0]);
 
   const handleUpload = async () => {
     if (!selectedFile) {
@@ -215,7 +80,10 @@ const Profile = () => {
       formData.append("image", selectedFile);
 
       const response = await uploadProfilePicture(formData);
-      setProfile({ ...profile, profilePicture: response.imageUrl });
+      setProfile((prev) => ({
+        ...prev,
+        profilePicture: response.imageUrl
+      }));
       setMessage({ type: "success", text: "Profile picture uploaded successfully" });
     } catch (error) {
       setMessage({ type: "danger", text: "Failed to upload profile picture" });
@@ -225,69 +93,80 @@ const Profile = () => {
     }
   };
 
-  // Inline styles
+  // ✅ Handle Certificate Upload
+  const handleCertificateChange = (e) => setCertificateFile(e.target.files[0]);
+
+  const handleUploadCertificate = async () => {
+    if (!certificateFile) {
+      setMessage({ type: "warning", text: "Please select a certificate file first" });
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("certificate", certificateFile);
+
+      const response = await uploadCertificate(formData);
+      setProfile((prev) => ({
+        ...prev,
+        certificateUrl: response.certificateUrl // ✅ Update certificate URL correctly
+      }));
+      setMessage({ type: "success", text: "Certificate uploaded successfully" });
+    } catch (error) {
+      setMessage({ type: "danger", text: "Failed to upload certificate" });
+    } finally {
+      setCertificateFile(null);
+    }
+  };
+
+  // ✅ Styles
   const styles = {
     container: {
-      backgroundColor: "#f9fafc",
-      padding: "40px",
-      borderRadius: "12px",
-      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+      backgroundColor: "#faf3e0",
+      padding: "30px",
+      borderRadius: "16px",
+      boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
       marginTop: "20px"
     },
     title: {
       fontSize: "2rem",
-      fontWeight: "600",
-      color: "#2c3e50",
-      borderBottom: "2px solid #007bff",
-      paddingBottom: "10px",
-      marginBottom: "20px"
-    },
-    profileImage: {
-      width: "180px",
-      height: "180px",
-      objectFit: "cover",
-      borderRadius: "50%",
-      border: "4px solid #e0e0e0",
-      boxShadow: "0 2px 10px rgba(0,0,0,0.2)"
-    },
-    profilePlaceholder: {
-      width: "180px",
-      height: "180px",
-      backgroundColor: "#f0f0f0",
-      color: "#7f8c8d",
-      fontSize: "64px",
       fontWeight: "700",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      borderRadius: "50%",
-      boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
+      color: "#2c3e50",
+      borderBottom: "3px solid #ff6f61",
+      paddingBottom: "12px",
+      marginBottom: "24px"
     },
-    formControl: {
-      borderRadius: "8px",
-      padding: "10px",
-      fontSize: "16px",
-      backgroundColor: "#f5f5f5",
-      border: "1px solid #ddd"
-    },
-    button: {
-      borderRadius: "20px",
-      padding: "10px 20px",
-      fontWeight: "500",
-      transition: "background-color 0.3s ease"
+    card: {
+      padding: "20px",
+      borderRadius: "12px",
+      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+      backgroundColor: "#ffffff",
+      border: "1px solid #f0f0f0"
     },
     buttonPrimary: {
-      backgroundColor: "#007bff",
-      borderColor: "#007bff",
-      color: "#fff"
+      backgroundColor: "#ff6f61",
+      borderColor: "#ff6f61",
+      color: "#ffffff",
+      borderRadius: "8px",
+      padding: "10px 20px",
+      fontSize: "16px",
+      cursor: "pointer",
+      transition: "background-color 0.3s ease"
     },
-    buttonSecondary: {
-      backgroundColor: "#6c757d",
-      borderColor: "#6c757d",
-      color: "#fff"
+    profileImage: {
+      width: "100px",
+      height: "100px",
+      objectFit: "cover",
+      borderRadius: "50%",
+      border: "3px solid #e0e0e0"
     },
-    buttonHover: {
-      backgroundColor: "#0056b3"
+    certificateImage: {
+      width: "100%",
+      height: "150px",
+      objectFit: "cover",
+      borderRadius: "8px",
+      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+      marginTop: "10px"
     }
   };
 
@@ -295,94 +174,64 @@ const Profile = () => {
     <Container style={styles.container}>
       <h1 style={styles.title}>Your Profile</h1>
       {message.text && (
-        <Alert variant={message.type} dismissible onClose={() => setMessage({ type: "", text: "" })}>
+        <Alert variant={message.type} onClose={() => setMessage({ type: "", text: "" })} dismissible>
           {message.text}
         </Alert>
       )}
 
-      <Row className="mt-4">
-        <Col md={4} className="text-center">
-          {profile.profilePicture ? (
-            <Image src={profile.profilePicture || "/default-profile.png"} style={styles.profileImage} />
-          ) : (
-            <div style={styles.profilePlaceholder}>
-              <span>{profile.name?.charAt(0).toUpperCase()}</span>
-            </div>
-          )}
-
-          <Form.Group controlId="profilePicture" className="mt-3">
-            <Form.Control
-              type="file"
-              onChange={handleFileChange}
-              accept="image/*"
-              style={styles.formControl}
-            />
-          </Form.Group>
-          <Button
-            style={{ ...styles.button, ...styles.buttonPrimary }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = styles.buttonHover.backgroundColor)}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = styles.buttonPrimary.backgroundColor)}
-            className="mt-2"
-            onClick={handleUpload}
-            disabled={isUploading || !selectedFile}
-          >
-            {isUploading ? "Uploading..." : "Upload"}
-          </Button>
+      <Row className="g-4">
+        {/* Upload Profile Picture */}
+        <Col md={4}>
+          <Card style={styles.card}>
+            {profile.profilePicture && (
+              <Image src={profile.profilePicture} style={styles.profileImage} />
+            )}
+            <Form.Control type="file" onChange={handleFileChange} className="mt-3" />
+            <Button onClick={handleUpload} style={styles.buttonPrimary} className="mt-2">
+              Upload
+            </Button>
+          </Card>
         </Col>
 
-        <Col md={8}>
-          {isEditing ? (
-            <Form onSubmit={handleUpdateProfile}>
-              <Form.Group controlId="name" className="mb-3">
-                <Form.Label>Name</Form.Label>
+        {/* Edit Profile */}
+        <Col md={4}>
+          <Card style={styles.card}>
+            {isEditing ? (
+              <Form onSubmit={handleUpdateProfile}>
                 <Form.Control
                   type="text"
                   value={updateData.name}
                   onChange={(e) => setUpdateData({ ...updateData, name: e.target.value })}
-                  required
-                  style={styles.formControl}
                 />
-              </Form.Group>
-
-              <Form.Group controlId="email" className="mb-3">
-                <Form.Label>Email</Form.Label>
                 <Form.Control
                   type="email"
                   value={updateData.email}
                   onChange={(e) => setUpdateData({ ...updateData, email: e.target.value })}
-                  required
-                  style={styles.formControl}
                 />
-              </Form.Group>
+                <Button type="submit" style={styles.buttonPrimary}>Save</Button>
+                <Button onClick={() => setIsEditing(false)}>Cancel</Button>
+              </Form>
+            ) : (
+              <>
+                <p>Name: {profile.name}</p>
+                <p>Email: {profile.email}</p>
+                <Button onClick={() => setIsEditing(true)} style={styles.buttonPrimary}>
+                  Edit Profile
+                </Button>
+              </>
+            )}
+          </Card>
+        </Col>
 
-              <div className="d-flex gap-2">
-                <Button
-                  style={{ ...styles.button, ...styles.buttonPrimary }}
-                  type="submit"
-                >
-                  Save Changes
-                </Button>
-                <Button
-                  style={{ ...styles.button, ...styles.buttonSecondary }}
-                  onClick={() => setIsEditing(false)}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </Form>
-          ) : (
-            <div>
-              <p><strong>Name:</strong> {profile.name}</p>
-              <p><strong>Email:</strong> {profile.email}</p>
-              <p><strong>Role:</strong> {profile.role || "Student"}</p>
-              <Button
-                style={{ ...styles.button, ...styles.buttonPrimary }}
-                onClick={() => setIsEditing(true)}
-              >
-                Edit Profile
-              </Button>
-            </div>
-          )}
+        {/* Upload Certificate */}
+        <Col md={4}>
+          <Card style={styles.card}>
+            {profile.certificateUrl && (
+              <Image src={profile.certificateUrl} style={styles.certificateImage} />
+            )}
+            <Form.Control type="file" onChange={handleCertificateChange} />
+            <Button onClick={handleUploadCertificate}>Upload Certificate</Button>
+          </Card>
         </Col>
       </Row>
     </Container>

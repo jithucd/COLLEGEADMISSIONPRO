@@ -94,3 +94,34 @@ export const removeFromFavorites = async (courseId) => {
     throw error;
   }
 };
+
+
+export const uploadCertificate = async (formData) => {
+  const token = localStorage.getItem("token"); // ✅ Get token directly from localStorage
+
+  if (!token) {
+    throw new Error("No authentication token found. Please log in again.");
+  }
+
+  try {
+    const response = await axios.post(`${API_URL}/upload-certificate`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`, // ✅ Send token in the header
+        "Content-Type": "multipart/form-data" // ✅ Handle file upload properly
+      },
+    });
+
+    return response.data; // ✅ Return Cloudinary URL
+  } catch (error) {
+    console.error("Certificate upload failed:", error.response?.data || error.message);
+
+    // ✅ Handle 401 Unauthorized
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/login"; // Redirect to login
+      throw new Error("Session expired. Please log in again.");
+    }
+
+    throw new Error(error.response?.data?.error || "Failed to upload certificate");
+  }
+};

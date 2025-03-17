@@ -44,22 +44,32 @@ exports.isCollegeAdmin = async (req, res, next) => {
   try {
     console.log("Middleware hit - isCollegeAdmin");
     console.log("Authenticated user ID:", req.user?.id);
+
     const adminId = new mongoose.Types.ObjectId(req.user.id);
+
+    // ✅ Rely on the `pre('find')` hook to populate admin
     const college = await College.findOne({ admin: adminId });
+
     if (!college) {
       console.log("No college found for this admin.");
       return res.status(404).json({ error: "College not found." });
     }
-    if (college.admin.toString() !== req.user.id) {
+
+    // ✅ Add null check for populated admin
+    if (!college.admin || college.admin._id.toString() !== req.user.id) {
       return res.status(403).json({ error: "Unauthorized action." });
     }
-    console.log("College found:", college.name);
+
+    console.log("College found:", college.name, "Admin Name:", college.admin.name);
+
     next();
   } catch (err) {
     console.error("Error in isCollegeAdmin:", err);
     res.status(500).json({ error: "Server error." });
   }
 };
+
+
 exports.protect = async (req, res, next) => {
   let token;
 

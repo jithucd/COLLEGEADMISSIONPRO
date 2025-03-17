@@ -13,5 +13,13 @@ const collegeSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+// ✅ Populate admin name when fetching data
+collegeSchema.pre(/^find/, function(next) {
+  this.populate({
+    path: 'admin',
+    select: 'name' // ✅ Select only admin name
+  });
+  next();
+});
 
 module.exports = mongoose.model("College", collegeSchema);

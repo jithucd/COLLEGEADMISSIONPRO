@@ -44,5 +44,20 @@ router.get("/colleges/:id", async (req, res) => {
 });
 router.put("/:collegeId/status", authenticate, isAdmin, adminController.toggleCollegeStatus);
 router.post('/upload-image/:collegeId', authenticate, upload.single('image'), uploadCollegeImage);
-
+router.put('/:id', authenticate, collegeController.updateCollegeDetails);
+// router.post('/upload-proof/:collegeId', authenticate, upload.single('proof'), async (req, res) => {
+//   try {
+//     const result = await cloudinary.uploader.upload(req.file.path);
+//     // Update the college with the new proof URL
+//     const updatedCollege = await College.findByIdAndUpdate(
+//       req.params.collegeId,
+//       { proofUrl: result.secure_url },
+//       { new: true }
+//     );
+//     res.status(200).json({ url: updatedCollege.proofUrl });
+//   } catch (error) {
+//     console.error('Error uploading proof:', error);
+//     res.status(500).json({ error: 'Failed to upload proof' });
+//   }
+// });
 module.exports = router;

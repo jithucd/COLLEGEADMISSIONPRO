@@ -98,3 +98,23 @@ exports.uploadCollegeImage = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+exports.updateCollegeDetails = async (req, res) => {
+  const { name, location, proofUrl, description } = req.body;
+  try {
+    const college = await College.findByIdAndUpdate(
+      req.params.id,
+      { name, location, proofUrl, description },
+      { new: true }
+    );
+
+    if (!college) {
+      return res.status(404).json({ error: "College not found" });
+    }
+
+    res.json(college);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to update college details" });
+  }
+};
