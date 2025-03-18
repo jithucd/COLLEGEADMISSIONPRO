@@ -38,8 +38,8 @@ function App() {
               <Route path="/admission/:admissionId/status" element={<AdmissionStatus />} />
               <Route path="/college-admin-dashboard" element={<CollegeAdminDashboard />} />
               <Route path="/colleges/:id" element={<CollegeDetail />} />
-              <Route path="/add-course" element={<AddCourse />} />
-              <Route path="/college/:collegeId/add-course" element={<AddCourse />} />
+              <Route path="/courses" element={<AddCourse />} />
+              <Route path="/college/:collegeId/courses" element={<AddCourse />} />
               <Route path="/profile" element={<ProfilePage />} />
             </Routes>
           </Container>

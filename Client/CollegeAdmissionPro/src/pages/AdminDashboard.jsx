@@ -212,7 +212,7 @@ const AdminDashboard = () => {
                         View
                       </Button>
                       {/* Updated the route here to match the defined route in App.js */}
-                      <Button variant="primary" size="sm" href={`/college/${college._id}/add-course`}>
+                      <Button variant="primary" size="sm" href={`/college/${college._id}/courses`}>
                         Add Course
                       </Button>
                       {/* <Button

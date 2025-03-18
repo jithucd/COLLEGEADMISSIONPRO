@@ -56,9 +56,13 @@ exports.isCollegeAdmin = async (req, res, next) => {
     }
 
     // ✅ Add null check for populated admin
-    if (!college.admin || college.admin._id.toString() !== req.user.id) {
+    if (!college.admin || !college.admin._id || String(college.admin._id) !== String(req.user.id)) {
+      console.log("Admin mismatch:", String(college.admin?._id), "vs", String(req.user.id));
       return res.status(403).json({ error: "Unauthorized action." });
     }
+    
+    
+    
 
     console.log("College found:", college.name, "Admin Name:", college.admin.name);
 

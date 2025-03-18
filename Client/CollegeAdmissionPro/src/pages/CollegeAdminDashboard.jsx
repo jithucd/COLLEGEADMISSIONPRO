@@ -555,7 +555,7 @@ const handleProofFileChange = (e) => {
             <Card.Body>
               <Button
                 variant="primary"
-                href={`/college/${college._id}/add-course`}
+                href={`/college/${college._id}/courses`}
                 className="mb-3"
               >
                 Add New Course

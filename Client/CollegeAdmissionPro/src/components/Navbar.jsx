@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
 import { useAuth } from "../context/AuthContext";
+
 const dashboardRoutes = {
   admin: "/admin-dashboard",
   college_admin: "/college-admin-dashboard",
@@ -17,7 +18,14 @@ const NavigationBar = () => {
   };
 
   return (
-    <Navbar bg="dark" variant="dark" expand="lg" className="py-3">
+    <Navbar
+      style={{
+        background: "linear-gradient(to right, #FF7F50, #1E3A8A)", // Light orange and navy blue gradient
+      }}
+      variant="dark"
+      expand="lg"
+      className="py-3"
+    >
       <Container>
         <Navbar.Brand as={Link} to="/" className="fw-bold text-white">
           Services Management System
@@ -34,8 +42,8 @@ const NavigationBar = () => {
               Courses
             </Nav.Link>
 
-             {/* ✅ Single logic for Dashboard */}
-             {isLoggedIn && dashboardRoutes[userRole] && (
+            {/* ✅ Single logic for Dashboard */}
+            {isLoggedIn && dashboardRoutes[userRole] && (
               <Nav.Link as={Link} to={dashboardRoutes[userRole]} className="text-white">
                 Dashboard
               </Nav.Link>
