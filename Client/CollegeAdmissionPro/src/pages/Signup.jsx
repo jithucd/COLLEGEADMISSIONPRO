@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Container, Alert, Row, Col } from "react-bootstrap";
-
+import { useDispatch } from 'react-redux';
+import { login } from '../redux/authSlice';
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -14,6 +15,8 @@ const Signup = () => {
   const [proofFile, setProofFile] = useState(null);
   const [certificatesFile, setCertificatesFile] = useState(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
 
   // ✅ Handle file selection
   const handleFileChange = (e) => {
@@ -66,11 +69,11 @@ const Signup = () => {
       let certificatesUrl = null;
 
       // ✅ Upload the file if user is a college admin
-      if (role === "college_admin" && selectedFile) {
-        proofUrl  = await handleUpload();
+      if (role === "college_admin" && proofFile) {
+        proofUrl  = await handleUpload(proofFile);
       }
       if (role === "student" && certificatesFile) {
-        certificatesUrl = await uploadToCloudinary(certificatesFile);
+        certificatesUrl = await handleUpload(certificatesFile);
       }
       // ✅ Clean up input data
       const signupData =
@@ -100,9 +103,7 @@ const Signup = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(
-        JSON.parse(JSON.stringify(signupData))
-      ),
+      body: JSON.stringify(signupData),
     });
     
     if (!response.ok) {
@@ -114,8 +115,8 @@ const Signup = () => {
 
       const data = await response.json();
       console.log("Signup Success:", data);
-      localStorage.setItem("token", data.token);
-      navigate("/dashboard");
+      dispatch(login({ token: data.token, userRole: data.user.role }));
+      navigate("/login");
     } catch (error) {
       console.error("Signup failed:", error);
       setError(error.message || "Signup failed");
@@ -219,7 +220,7 @@ const Signup = () => {
 
                 <Form.Group style={{ marginBottom: "1.5rem" }}>
                   <Form.Label>Upload Proof</Form.Label>
-                  <Form.Control type="file" onChange={handleFileChange} required />
+                  <Form.Control type="file" onChange={(e) => handleFileChange(e, "proof")} required />
                 </Form.Group>
               </>
             )}

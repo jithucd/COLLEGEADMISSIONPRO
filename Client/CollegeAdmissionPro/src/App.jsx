@@ -16,14 +16,14 @@ import CollegeAdminDashboard from "./pages/CollegeAdminDashboard";
 import CollegeDetail from "./pages/CollegeDetail";
 import AddCourse from "./pages/AddCourse";
 import ProfilePage from "./components/Profile";
-import {  useAuth  } from "./context/AuthContext";
+
 function App() {
-  const { userRole } = useAuth(); 
+  
   return (
     <div style={styles.wrapper}>
      
       <BrowserRouter>
-        <Navbar key={userRole}/>
+        <Navbar/>
         <div style={styles.content}>
           <Container fluid className="px-0">
             <Routes>

@@ -85,19 +85,22 @@
 
 // export default Login;
 import { useState, useEffect } from "react";
+import { useDispatch } from 'react-redux';
 import { login as apiLogin } from "../services/auth";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Container, Alert, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useAuth } from "../context/AuthContext";
+import { login } from '../redux/authSlice';
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [retryAfter, setRetryAfter] = useState(0);
+
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { login: contextLogin } = useAuth();
+ 
 
   useEffect(() => {
     if (error?.includes("Too many")) {
@@ -114,10 +117,7 @@ const Login = () => {
        // Use the renamed service function
        const response = await apiLogin({ email, password });
        if (response?.token) {
-         // Use the context login to update state
-         contextLogin(response.token, response.role); // Pass role from API response
-
-      // Navigate to the dashboard
+        dispatch(login({ token: response.token, userRole: response.user.role }));
       navigate("/dashboard");
    }
    } catch (error) {
@@ -170,7 +170,7 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                disabled={retryAfter > 0}
+                
                 style={{
                   border: "2px solid #e9ecef",
                   borderRadius: "5px",
@@ -189,7 +189,7 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                disabled={retryAfter > 0}
+               
                 style={{
                   border: "2px solid #e9ecef",
                   borderRadius: "5px",
@@ -210,7 +210,7 @@ const Login = () => {
                   fontSize: "1.1rem",
                   transition: "background-color 0.3s ease",
                 }}
-                disabled={retryAfter > 0}
+               
               >
                 {retryAfter > 0 ? `Please wait... (${retryAfter})` : "Login"}
               </Button>
