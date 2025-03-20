@@ -7,14 +7,18 @@ const Colleges = () => {
   const [colleges, setColleges] = useState([]);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchColleges = async () => {
       try {
+        setLoading(true);
         const response = await getAllColleges();
         setColleges(response);
       } catch (err) {
         setError("Failed to load colleges");
+      }finally{
+        setLoading(false);
       }
     };
     fetchColleges();
@@ -42,7 +46,13 @@ const Colleges = () => {
 
       <h1 style={styles.header}>Explore Colleges</h1>
       {error && <p style={styles.error}>{error}</p>}
-
+      {loading ? (
+        <div style={styles.loadingContainer}>
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      ) : (
       <div style={styles.grid}>
         {filteredColleges.length > 0 ? (
           filteredColleges.map((college) => (
@@ -52,6 +62,7 @@ const Colleges = () => {
           <p style={styles.noResults}>No colleges found</p>
         )}
       </div>
+      )}
     </div>
   );
 };

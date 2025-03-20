@@ -5,10 +5,11 @@ import CourseCard from "../components/CourseCard";
 const Courses = () => {
   const [courses, setCourses] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [loading, setLoading] = useState(true); 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
+        setLoading(true);
         const response = await getAllCourses();
         if (Array.isArray(response)) {
           setCourses(response);
@@ -17,6 +18,8 @@ const Courses = () => {
         }
       } catch (error) {
         console.error("Error fetching courses:", error);
+      }finally {
+        setLoading(false); // ✅ Stop loading
       }
     };
     fetchCourses();
@@ -43,7 +46,13 @@ const Courses = () => {
       </div>
 
       <h1 style={styles.header}>Courses</h1>
-
+      {loading ? (
+        <div style={styles.loadingContainer}>
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      ) : (
       <div style={styles.grid}>
         {filteredCourses.length > 0 ? (
           filteredCourses.map((course) => (
@@ -53,6 +62,7 @@ const Courses = () => {
           <p style={styles.noResults}>No courses found</p>
         )}
       </div>
+      )}
     </div>
   );
 };
