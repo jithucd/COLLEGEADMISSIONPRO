@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Container, Tab, Tabs, Table, Button, Modal, Form, Alert } from "react-bootstrap";
 import { getAllUsers, getAllColleges, toggleUserStatus, toggleCollegeStatus, createCollege, getCollegeProof } from "../services/admin";
 import { Image } from "react-bootstrap";
-
+import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
@@ -17,7 +17,7 @@ const AdminDashboard = () => {
   const [message, setMessage] = useState({ type: "", text: "" });
   const [showProofModal, setShowProofModal] = useState(false);
   const [proofUrl, setProofUrl] = useState("");
-
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -185,9 +185,9 @@ const AdminDashboard = () => {
             </Button>
           </div>
           <Alert variant="info">
-  📢 <strong>Note:</strong> Please click the <strong>"Verify"</strong> button to check the college proof.  
-  To activate/deactivate the account, go to the <strong>Users</strong> tab and click the <strong>Action</strong> button.
-</Alert>
+            📢 <strong>Note:</strong> Please click the <strong>"Verify"</strong> button to check the college proof.
+            To activate/deactivate the account, go to the <strong>Users</strong> tab and click the <strong>Action</strong> button.
+          </Alert>
           <Table striped bordered hover responsive>
             <thead>
               <tr>
@@ -208,12 +208,12 @@ const AdminDashboard = () => {
 
                     <td>{college.adminName}</td>
                     <td>
-                      <Button variant="info" size="sm" href={`/colleges/${college._id}`} className="me-2">
+                      <Button variant="info" size="sm"  onClick={() => navigate(`/colleges/${college._id}`)} className="me-2">
                         View
                       </Button>
-                      {/* Updated the route here to match the defined route in App.js */}
-                      <Button variant="primary" size="sm" href={`/college/${college._id}/courses`}>
-                        Add Course
+                     
+                      <Button variant="info"  size="sm" onClick={() => navigate(`/college/${college._id}/courses`)}  className="me-2" >
+                      Add Course
                       </Button>
                       {/* <Button
                         variant={college.active ? "danger" : "success"}

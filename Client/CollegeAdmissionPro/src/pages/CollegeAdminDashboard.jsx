@@ -531,11 +531,12 @@ const CollegeAdminDashboard = () => {
             <Card.Body>
               <Button
                 variant="primary"
-                href={`/college/${college._id}/courses`}
+                onClick={() => navigate(`/college/${college._id}/courses`)}
                 className="mb-3"
               >
                 Add New Course
               </Button>
+            
               <div className="mt-3">
                 <h5>Existing Courses</h5>
                 {college.courses && college.courses.length > 0 ? (
