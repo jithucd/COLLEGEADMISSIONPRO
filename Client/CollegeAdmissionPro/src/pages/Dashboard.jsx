@@ -48,7 +48,14 @@ const Dashboard = () => {
         const userData = await getProfile();
         setUserData(userData);
 
-        if (userData.role !== "student") {
+         // ✅ Redirect based on role
+         if (userData.role === "admin") {
+          navigate("/admin-dashboard");
+          return;
+        } else if (userData.role === "college-admin") {
+          navigate("/college-admin-dashboard");
+          return;
+        } else if (userData.role !== "student") {
           setError("Access Denied: Only students can view this dashboard");
           setLoading(false);
           return;
