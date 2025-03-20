@@ -25,6 +25,7 @@ exports.authenticate = async (req, res, next) => {
     }
 
     req.user = user; // Attach user to request object
+    console.log("Authenticated user:", user);
     next();
   } catch (err) {
     res.status(401).json({ error: "Invalid token." });
@@ -33,7 +34,11 @@ exports.authenticate = async (req, res, next) => {
 
 // Check if user is an admin
 exports.isAdmin = (req, res, next) => {
-  if (req.user.role !== "admin" || !req.user) {
+  if (!req.user) {
+    return res.status(401).json({ error: "User not authenticated." });
+  }
+
+  if (req.user.role !== "admin" ) {
     return res.status(403).json({ error: "Access denied. Admin role required." });
   }
   next();
@@ -44,11 +49,13 @@ exports.isCollegeAdmin = async (req, res, next) => {
   try {
     console.log("Middleware hit - isCollegeAdmin");
     console.log("Authenticated user ID:", req.user?.id);
-
-    const adminId = new mongoose.Types.ObjectId(req.user.id);
+    if (!req.user) {
+      return res.status(401).json({ error: "User not authenticated." });
+    }
+    
 
     // ✅ Rely on the `pre('find')` hook to populate admin
-    const college = await College.findOne({ admin: adminId });
+    const college = await College.findOne({ admin: req.user.id }).populate("admin");
 
     if (!college) {
       console.log("No college found for this admin.");
@@ -56,8 +63,7 @@ exports.isCollegeAdmin = async (req, res, next) => {
     }
 
     // ✅ Add null check for populated admin
-    if (!college.admin || !college.admin._id || String(college.admin._id) !== String(req.user.id)) {
-      console.log("Admin mismatch:", String(college.admin?._id), "vs", String(req.user.id));
+    if (!college.admin || String(college.admin._id) !== req.user.id) {
       return res.status(403).json({ error: "Unauthorized action." });
     }
     

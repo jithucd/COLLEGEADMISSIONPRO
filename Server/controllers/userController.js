@@ -5,15 +5,18 @@ const User = require("../models/User");
 exports.getUserProfile = async (req, res) => {
   try {
     // const user = await User.findById(req.user.id).populate("favorites");
+    console.log("Fetching profile for user ID:", req.user.id);
     const user = await User.findById(req.user.id)
     .populate({
       path: "favorites",
       populate: { path: "college", select: "name" }
     });
+
     if (!user) {
+      console.log("❌ User not found");
       return res.status(404).json({ message: "User not found" });
     }
-
+    console.log("✅ User fetched:", user);
     res.json({
       _id: user._id,
       name: user.name,

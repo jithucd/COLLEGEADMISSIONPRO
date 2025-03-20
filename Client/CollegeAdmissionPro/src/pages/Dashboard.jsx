@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Table, Alert, Button, Spinner } from "react-bootstrap";
-import { getProfile, removeFromFavorites } from "../services/user";
+import { getProfile, removeFromFavorites } from "/src/services/user.js";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
+import { useSelector } from 'react-redux';
 
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
@@ -12,6 +13,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const userRole = useSelector((state) => state.auth.userRole);
 
   const handleApplyNow = (courseId) => {
     if (!courseId) {
@@ -44,34 +46,27 @@ const Dashboard = () => {
           return;
         }
 
-        // Fetch user profile
         const userData = await getProfile();
-        setUserData(userData);
+        setUserData({
+          ...userData,
+          collegeId: userData.collegeId?._id || null,
+        });
 
-       
-        // Fetch admissions data
         const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+        const response = await axios.get(`${API_URL}/api/admissions`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      // ✅ Fetch admissions with token
-    const response = await axios.get(`${API_URL}/api/admissions`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+        const filteredAdmissions = response.data.filter((admission) => {
+          if (userRole === "student") {
+            return String(admission.user?._id) === String(userData._id);
+          } else if (userRole === "college-admin" && admission.college && userData.collegeId) {
+            return String(admission.college?._id) === String(userData.collegeId);
+          }
+          return false;
+        });
 
-    console.log("Admissions response:", response.data);
-
-    // ✅ Fixing comparison issue with String()
-    const filteredAdmissions = response.data.filter((admission) => {
-      console.log("Comparing:", String(admission.user?._id), "with", String(userData?._id));
-      return (
-        admission?.user?._id && 
-        String(admission.user._id).trim() === String(userData._id).trim()
-      );
-    });
-
-    console.log("Filtered Admissions:", filteredAdmissions);
-
-    setAdmissions(filteredAdmissions);
-    
+        setAdmissions(filteredAdmissions);
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
         setError(err.response?.data?.error || "Failed to load dashboard data");
@@ -81,20 +76,19 @@ const Dashboard = () => {
     };
 
     fetchData();
-  }, [navigate]);
+  }, [navigate, userRole]);
 
   useEffect(() => {
-    if (userData) {
-      const role = userData.role?.toLowerCase(); // Handle case insensitivity
-      if (role === "admin") {
+    if (!loading && userRole) {
+      if (userRole === "admin") {
         navigate("/admin-dashboard");
-      } else if (role === "college-admin") {
+      } else if (userRole === "college_admin") {
         navigate("/college-admin-dashboard");
-      } else if (role !== "student") {
+      } else if (userRole !== "student") {
         setError("Access Denied: Only students can view this dashboard");
       }
     }
-  }, [userData, navigate]);
+  }, [userData, navigate, loading, userRole]);
 
   if (loading) {
     return (
@@ -115,38 +109,11 @@ const Dashboard = () => {
   }
 
   return (
-    <Container fluid
-    className="p-4"
-    style={{
-      backgroundColor: "#f8f9fa",
-      backgroundImage: "url('/images/bg4.jpg')",
-      backgroundRepeat: "no-repeat",
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      minHeight: "100vh",
-      
-    }}>
+    <Container fluid className="p-4" style={styles.container}>
       <h1 style={styles.header}>Welcome, {userData?.name}!</h1>
       <p style={styles.subHeader}>Student Dashboard</p>
 
       <Row className="mt-4">
-        {/* Profile Card
-        <Col md={4} className="mb-4">
-          <Card style={styles.card}>
-            <Card.Body>
-              <Card.Title style={styles.cardTitle}>Your Profile</Card.Title>
-              <Card.Text style={styles.cardText}>
-                <strong>Name:</strong> {userData?.name}
-                <br />
-                <strong>Email:</strong> {userData?.email}
-                <br />
-                <strong>Role:</strong> {userData?.role || "Student"}
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col> */}
-
-        {/* Favorite Courses */}
         <Col md={12}>
           <Card style={styles.card}>
             <Card.Body>
@@ -195,7 +162,6 @@ const Dashboard = () => {
             </Card.Body>
           </Card>
 
-          {/* Admission Status */}
           <Card style={styles.card}>
             <Card.Body>
               <Card.Title style={styles.cardTitle}>Admission Status</Card.Title>
@@ -244,8 +210,7 @@ const Dashboard = () => {
 const styles = {
   container: {
     padding: "30px",
-    backgroundColor: "#f9fafc"
- 
+    backgroundColor: "#f9fafc",
   },
   header: {
     fontSize: "2.5rem",
