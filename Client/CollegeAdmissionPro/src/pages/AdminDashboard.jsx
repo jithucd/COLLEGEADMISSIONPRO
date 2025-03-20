@@ -58,17 +58,23 @@ const AdminDashboard = () => {
       setError("No authentication token found");
       return;
     }
-
+  
     try {
-      const result = await getCollegeProof(collegeId, token);
-      console.log("✅ Proof Data:", result);
-      setProofUrl(result.proofUrl);
-      setShowProofModal(true);
+      // ✅ Find the admin user linked to the college
+      const adminUser = users.find(user => user.college === collegeId);
+      if (adminUser && adminUser.certificateUrl) {
+        console.log("✅ Certificate Data:", adminUser.certificateUrl);
+        setProofUrl(adminUser.certificateUrl);
+        setShowProofModal(true);
+      } else {
+        setError("No proof document available for this college");
+      }
     } catch (err) {
       console.error("❌ Failed to load proof:", err.message);
       setError("Failed to load proof document");
     }
   };
+  
   const handleToggleUserStatus = async (userId, isActive) => {
     const token = localStorage.getItem("token");
     if (!token) {

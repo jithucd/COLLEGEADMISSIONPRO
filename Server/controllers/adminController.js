@@ -184,11 +184,13 @@ exports.getCollegeProof = async (req, res) => {
       return res.status(404).json({ error: "College not found" });
     }
 
-    if (!college.proofUrl) {
-      return res.status(404).json({ error: "No proof document available" });
+    const adminUser = await User.findOne({ college: collegeId, role: 'college_admin' });
+
+    if (!adminUser || !adminUser.certificateUrl) {
+      return res.status(404).json({ error: "No certificate available for this college admin" });
     }
 
-    res.json({ proofUrl: college.proofUrl });
+    res.status(200).json({ certificateUrl: adminUser.certificateUrl });
   } catch (err) {
     console.error("❌ Failed to get proof document:", err);
     res.status(500).json({ error: "Failed to get proof document" });
