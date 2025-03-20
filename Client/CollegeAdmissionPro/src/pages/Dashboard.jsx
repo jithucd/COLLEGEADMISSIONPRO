@@ -48,18 +48,7 @@ const Dashboard = () => {
         const userData = await getProfile();
         setUserData(userData);
 
-         // ✅ Redirect based on role
-         if (userData.role === "admin") {
-          navigate("/admin-dashboard");
-          return;
-        } else if (userData.role === "college-admin") {
-          navigate("/college-admin-dashboard");
-          return;
-        } else if (userData.role !== "student") {
-          setError("Access Denied: Only students can view this dashboard");
-          setLoading(false);
-          return;
-        }
+       
         // Fetch admissions data
         const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -93,6 +82,19 @@ const Dashboard = () => {
 
     fetchData();
   }, [navigate]);
+
+  useEffect(() => {
+    if (userData) {
+      const role = userData.role?.toLowerCase(); // Handle case insensitivity
+      if (role === "admin") {
+        navigate("/admin-dashboard");
+      } else if (role === "college-admin") {
+        navigate("/college-admin-dashboard");
+      } else if (role !== "student") {
+        setError("Access Denied: Only students can view this dashboard");
+      }
+    }
+  }, [userData, navigate]);
 
   if (loading) {
     return (
