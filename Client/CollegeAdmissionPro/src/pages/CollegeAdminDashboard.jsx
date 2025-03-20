@@ -72,21 +72,21 @@ const CollegeAdminDashboard = () => {
       console.error("Error updating admission:", err);
     }
   };
-// For image upload
-const handleImageFileChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    setSelectedFile(file);
-  }
-};
+  // For image upload
+  const handleImageFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
 
-// For proof upload
-const handleProofFileChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    setProofFile(file);
-  }
-};
+  // For proof upload
+  const handleProofFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProofFile(file);
+    }
+  };
 
   const handleEditCollege = () => {
     setEditedCollege({
@@ -115,8 +115,8 @@ const handleProofFileChange = (e) => {
       alert("Failed to update college details");
     }
   };
-  
-  
+
+
 
   // ✅ Handle input change in the edit form
   const handleChangeCollegeData = (e) => {
@@ -192,9 +192,9 @@ const handleProofFileChange = (e) => {
 
     try {
       const token = localStorage.getItem('token');
-      
+
       const response = await fetch(
-        
+
         `${import.meta.env.VITE_API_URL}/api/colleges/upload-image/${college._id}`,
         {
           method: 'POST',
@@ -221,10 +221,10 @@ const handleProofFileChange = (e) => {
 
   const handleUploadProof = async () => {
     if (!proofFile) return alert("Please select a proof file");
-  
+
     const formData = new FormData();
     formData.append("file", proofFile);
-  
+
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
@@ -238,14 +238,14 @@ const handleProofFileChange = (e) => {
           body: formData,
         }
       );
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
           `Failed to upload proof: ${errorData.error || response.statusText}`
         );
       }
-  
+
       const data = await response.json();
       if (data.url) {
         alert("Proof uploaded successfully!");
@@ -258,7 +258,7 @@ const handleProofFileChange = (e) => {
       alert("Failed to upload proof");
     }
   };
-  
+
   const handleViewCertificate = (certificateUrl) => {
     if (certificateUrl) {
       setCertificateUrl(certificateUrl);
@@ -268,7 +268,7 @@ const handleProofFileChange = (e) => {
     }
   };
 
- 
+
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -400,31 +400,7 @@ const handleProofFileChange = (e) => {
                     </a>
                   </p> */}
                 </Col>
-                <Col md={4}>
-                <input
-  type="file"
-  id="imageUpload"
-  className="d-none"
-  onChange={handleImageFileChange}   // use the image file handler
-  accept="image/*"
-/>
-                <Form.Group controlId="proofFile" className="mb-3">
-  <Form.Label>Upload Proof</Form.Label>
-  <Form.Control type="file" onChange={handleProofFileChange} /> {/* use the proof file handler */}
-  {proofFile && (
-    <Button
-      variant="success"
-      onClick={handleUploadProof}
-      className="mt-2"
-    >
-      Submit Proof
-    </Button>
-  )}
-</Form.Group>
-
-
-
-                </Col>
+               
                 <Col md={4} className="text-end">
                   <Button variant="warning" onClick={handleEditCollege}>
                     <FaEdit className="me-2" />
@@ -462,7 +438,7 @@ const handleProofFileChange = (e) => {
                             variant="info"
                             size="sm"
                             onClick={() => {
-                              console.log("Selected Admission: ", admission); 
+                              console.log("Selected Admission: ", admission);
                               setSelectedAdmission({
                                 ...admission,
                                 certificateUrl: admission.user?.certificateUrl || null, // ✅ Pass certificateUrl directly
@@ -494,19 +470,19 @@ const handleProofFileChange = (e) => {
                           </Button>
                         </td>
                         <td>
-                {/* ✅ "View Certificate" Button */}
-                {admission.certificateUrl ? (
-                  <Button
-                    variant="info"
-                    size="sm"
-                    onClick={() => handleViewCertificate(admission.certificateUrl)}
-                  >
-                    View Certificate
-                  </Button>
-                ) : (
-                  <span>No Certificate</span>
-                )}
-              </td>
+                          {/* ✅ "View Certificate" Button */}
+                          {admission.certificateUrl ? (
+                            <Button
+                              variant="info"
+                              size="sm"
+                              onClick={() => handleViewCertificate(admission.certificateUrl)}
+                            >
+                              View Certificate
+                            </Button>
+                          ) : (
+                            <span>No Certificate</span>
+                          )}
+                        </td>
                       </tr>
                     ))
                   ) : (
@@ -518,33 +494,33 @@ const handleProofFileChange = (e) => {
                   )}
                 </tbody>
               </Table>
-                 {/* ✅ Certificate Modal */}
-       <Modal
-        show={showCertificateModal}
-        onHide={() => setShowCertificateModal(false)}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Student Certificate</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {certificateUrl ? (
-            <img
-              src={certificateUrl}
-              alt="Certificate"
-              style={{
-                width: "100%",
-                height: "auto",
-                borderRadius: "8px",
-              }}
-            />
-          ) : (
-            <p>No certificate available</p>
-          )}
-        </Modal.Body>
-      </Modal>
+              {/* ✅ Certificate Modal */}
+              <Modal
+                show={showCertificateModal}
+                onHide={() => setShowCertificateModal(false)}
+                centered
+              >
+                <Modal.Header closeButton>
+                  <Modal.Title>Student Certificate</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  {certificateUrl ? (
+                    <img
+                      src={certificateUrl}
+                      alt="Certificate"
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                        borderRadius: "8px",
+                      }}
+                    />
+                  ) : (
+                    <p>No certificate available</p>
+                  )}
+                </Modal.Body>
+              </Modal>
             </Card.Body>
-            
+
           </Card>
 
           {/* Course Management Section */}
@@ -770,13 +746,13 @@ const handleProofFileChange = (e) => {
                   </p>
                   {/* ✅ Show Certificate if available */}
                   {selectedAdmission?.certificateUrl && (
-  <Image
-    src={selectedAdmission.certificateUrl}
-    alt="Certificate"
-    fluid
-    style={{ width: "100%", maxHeight: "300px", objectFit: "cover" }}
-  />
-)}
+                    <Image
+                      src={selectedAdmission.certificateUrl}
+                      alt="Certificate"
+                      fluid
+                      style={{ width: "100%", maxHeight: "300px", objectFit: "cover" }}
+                    />
+                  )}
                 </>
               )}
             </Modal.Body>
@@ -807,7 +783,7 @@ const handleProofFileChange = (e) => {
       ) : (
         <div className="text-center text-danger">Failed to load college data.</div>
       )}
-    
+
     </Container>
   );
 };
